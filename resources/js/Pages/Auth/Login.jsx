@@ -9,9 +9,9 @@ import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
+        matricule: '',
         password: '',
-        remember: '',
+        remember: 'false',
     });
 
     useEffect(() => {
@@ -38,20 +38,20 @@ export default function Login({ status, canResetPassword }) {
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="matricule" value="Matricule" />
 
                     <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
+                        id="matricule"
+                        type="text"
+                        name="matricule"
+                        value={data.matricule}
                         className="mt-1 block w-full"
                         autoComplete="username"
                         isFocused={true}
                         onChange={handleOnChange}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.matricule} className="mt-2" />
                 </div>
 
                 <div className="mt-4">

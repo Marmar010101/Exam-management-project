@@ -32,21 +32,29 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:'.User::class,
+            'marticule' => 'required|string|max:255|unique:'.User::class,
+            'role' => 'required|in:student,teacher',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+             'student_id' => 'nullable|exists:students,id', 
+            'teacher_id' => 'nullable|exists:teachers,id',
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'matricule' => $request->matricule,
             'password' => Hash::make($request->password),
+            'role' => $request->role,
+    'student_id' => $request->role === 'student' ? $request->student_id : null,
+    'teacher_id' => $request->role === 'teacher' ? $request->teacher_id : null,
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
-
+        if ($user->role === 'student') {
+    return redirect()->route('student.dashboard');
+} elseif ($user->role === 'teacher') {
+    return redirect()->route('teacher.dashboard');
+}
         return redirect(RouteServiceProvider::HOME);
     }
 }
