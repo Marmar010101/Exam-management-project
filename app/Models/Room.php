@@ -9,8 +9,12 @@ class Room extends Model
 {
     protected $fillable = [
         'room_name',
-        'room_capacity',
+        'capacity',
         'room_type',
         'availability',
     ];
+    public function exams()
+    {
+        return $this->belongsToMany(Exam::class, 'exam_rooms');
+    }
 }

@@ -17,14 +17,14 @@ class SemesterSeeder extends Seeder
     public function run()
     {
         $semesters = [
-    ['name'=>'Semestre 1','level_id'=>1],
-    ['name'=>'Semestre 2','level_id'=>1],
-    ['name'=>'Semestre 1','level_id'=>2],
-    ['name'=>'Semestre 2','level_id'=>2],
-    ['name'=>'Semestre 1','level_id'=>3],
-    ['name'=>'Semestre 2','level_id'=>3],
-    ['name'=>'Semestre 1','level_id'=>4],
-    ['name'=>'Semestre 2','level_id'=>4],
+    ['name'=>'S1','level_id'=>1],
+    ['name'=>'S2','level_id'=>1],
+    ['name'=>'S1','level_id'=>2],
+    ['name'=>'S2','level_id'=>2],
+    ['name'=>'S1','level_id'=>3],
+    ['name'=>'S2','level_id'=>3],
+    ['name'=>'S1','level_id'=>4],
+    ['name'=>'S2','level_id'=>4],
 ];
 foreach($semesters as $s) Semester::create($s);
     }

@@ -10,11 +10,16 @@ class Module extends Model
     protected $fillable = [
         'module_name',
         'teacher_id',
+        'group_id',
     ];
 
     
-    public function teacher()
-    {
-        return $this->belongsTo(Teacher::class);
-    }
+   public function teacher()
+{
+    return $this->belongsTo(Teacher::class, 'teacher_id');
+}
+    public function group()
+{
+    return $this->belongsTo(Group::class);
+}
 }

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
              $table->string('module_name');
              $table->foreignId('teacher_id')->nullable()->constrained('teachers')->nullOnDelete();
+             $table->foreignId('group_id')->constrained('groups')->onDelete('cascade');
 
             $table->timestamps();
         });

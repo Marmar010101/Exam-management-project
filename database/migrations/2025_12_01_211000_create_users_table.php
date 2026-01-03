@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('matricule')->unique();
              $table->string('email')->nullable();;
             $table->string('password');
+             $table->boolean('active')->default(1);
              $table->enum('role', ['student','teacher','responsable','headdepartment']);
             $table->rememberToken();
             $table->timestamps();

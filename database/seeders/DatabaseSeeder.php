@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
             HeadDepartmentSeeder::class,
             RoomSeeder::class,
             ResponsableSeeder::class,
+            ExamSeeder::class,
     ]);
     }
 }

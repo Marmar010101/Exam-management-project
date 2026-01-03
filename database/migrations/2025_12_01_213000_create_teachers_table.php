@@ -20,9 +20,9 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('grade'); 
             $table->boolean('is_responsable')->default(false);
-           
-
-
+            $table->json('unavailable_dates')->nullable();
+            $table->integer('max_exams_per_day')->default(2);
+            $table->integer('max_exams_per_week')->default(5);
             $table->timestamps();
         });
     }

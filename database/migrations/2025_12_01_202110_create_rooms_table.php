@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
             $table->string('room_name');
-            $table->string('room_capacity');
+            $table->integer('capacity');
             $table->string('room_type');
             $table->boolean('availability')->default(true);
             $table->timestamps();

@@ -13,9 +13,34 @@ class Teacher extends Model
         'last_name',
         'grade',
         'is_responsable',
+        'unavailable_dates',
+        'max_exams_per_day',
+        'max_exams_per_week',
     ];
-  public function user()
+
+    protected $casts = [
+        'is_responsable' => 'boolean',
+        'unavailable_dates' => 'array',
+    ];
+      public function user()
     {
         return $this->belongsTo(User::class);
+    }
+   /* public function supervisedExams()
+    //{
+        return $this->belongsToMany(Exam::class, 'exam_teachers');
+    }*/
+
+    public function invigilatedExams()
+{
+    return $this->belongsToMany(Exam::class, 'exam_invigilators');
+}
+public function modules()
+{
+    return $this->hasMany(Module::class);
+}
+ public function getFullNameAttribute()
+    {
+        return $this->first_name . ' ' . $this->last_name;
     }
 }

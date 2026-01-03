@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* Conflict Visualization Styles */
+.conflict-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.conflict-room {
+    @apply bg-red-100 text-red-800;
+}
+
+.conflict-teacher {
+    @apply bg-orange-100 text-orange-800;
+}
+
+.conflict-group {
+    @apply bg-purple-100 text-purple-800;
+}
+
+.conflict-time {
+    @apply bg-blue-100 text-blue-800;
+}

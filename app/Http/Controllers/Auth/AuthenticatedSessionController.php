@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\User;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -61,6 +62,7 @@ class AuthenticatedSessionController extends Controller
         }
         elseif ($user->role === 'responsable') {
     return redirect()->route('responsable.dashboard');
+    
 } elseif ($user->role === 'headdepartment') {
     return redirect()->route('headdepartment.dashboard');
 }

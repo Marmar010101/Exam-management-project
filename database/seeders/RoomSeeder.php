@@ -16,10 +16,10 @@ class RoomSeeder extends Seeder
     public function run()
     {
          $rooms = [
-            ['room_name' => 'Salle 101', 'room_capacity' => '30', 'room_type' => 'salle_td', 'availability' => true],
-            ['room_name' => 'Salle 202', 'room_capacity' => '25', 'room_type' => 'TP', 'availability' => true],
-            ['room_name' => 'Salle 303', 'room_capacity' => '100', 'room_type' => 'Amphi', 'availability' => true],
-            ['room_name' => 'Salle 404', 'room_capacity' => '20', 'room_type' => 'TP', 'availability' => true],
+            ['room_name' => 'S101', 'capacity' => '35', 'room_type' => 'salle_td', 'availability' => true],
+            ['room_name' => 'S202', 'capacity' => '25', 'room_type' => 'TP', 'availability' => true],
+            ['room_name' => 'N303', 'capacity' => '100', 'room_type' => 'Amphi', 'availability' => true],
+            ['room_name' => 'N404', 'capacity' => '20', 'room_type' => 'TP', 'availability' => true],
         ];
 
         foreach ($rooms as $r) {
