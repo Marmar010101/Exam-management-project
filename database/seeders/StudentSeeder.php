@@ -63,8 +63,8 @@ class StudentSeeder extends Seeder
             if ($group) {
                 Student::create([
                     'user_id'     => $user->id,
-                    'level_id'    => $group->level_id,
-                    'semester_id' => $group->semester_id,
+                    'first_name'  => $s['first_name'],
+                    'last_name'   => $s['last_name'],
                     'group_id'    => $group->id,
                 ]);
             }

@@ -54,8 +54,8 @@ class TeacherSeeder extends Seeder
 
         Teacher::create([
             'user_id'    => $user3->id,
-            'first_name' => 'Khaled',
-            'last_name'  => 'Boudiaf',
+            'first_name' => 'Sara',
+            'last_name'  => 'Moussa',
             'grade'      => 'MAA',
             'is_responsable' => false,
         ]);
