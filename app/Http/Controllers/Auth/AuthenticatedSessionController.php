@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,70 +12,52 @@ use Inertia\Response;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Display the login view.
-     */
     public function create(): Response
     {
         return Inertia::render('Auth/Login', [
-            'canResetPassword' => Route::has('password.request'),
+            'canResetPassword' => false, // Désactivé
             'status' => session('status'),
         ]);
     }
 
-    /**
-     * Handle an incoming authentication request.
-     */
     public function store(Request $request): RedirectResponse
     {
-        // Validate matricule + password
         $request->validate([
             'matricule' => ['required', 'string'],
             'password'  => ['required', 'string'],
         ]);
 
-        // Attempt login using matricule instead of email
         if (! Auth::attempt([
             'matricule' => $request->matricule,
             'password'  => $request->password,
         ], $request->boolean('remember'))) {
-
             return back()->withErrors([
-                'matricule' => 'The information does not match.',
+                'matricule' => 'Matricule ou mot de passe incorrect.',
             ]);
         }
 
-        // Regenerate session for security
         $request->session()->regenerate();
-
-       // Get the logged-in user
         $user = Auth::user();
 
-        
-    // Redirect based on role
-        if ($user->role === 'student') {
-            return redirect()->route('student.dashboard');
-        } elseif ($user->role === 'teacher') {
-            return redirect()->route('teacher.dashboard');
+        // Redirection selon le rôle
+        switch($user->role) {
+            case 'student':
+                return redirect()->route('student.dashboard');
+            case 'teacher':
+                return redirect()->route('teacher.dashboard');
+            case 'responsable':
+                return redirect()->route('responsable.dashboard');
+            case 'headdepartment':
+            case 'head_department':
+                return redirect()->route('headdepartment.dashboard');
+            default:
+                return redirect('/');
         }
-        elseif ($user->role === 'responsable') {
-    return redirect()->route('responsable.dashboard');
-} elseif ($user->role === 'headdepartment') {
-    return redirect()->route('headdepartment.dashboard');
-}
-
-
-        // fallback
-        return redirect(RouteServiceProvider::HOME);
     }
 
-    /**
-     * Destroy an authenticated session.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

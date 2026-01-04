@@ -8,14 +8,14 @@ module.exports = {
         './resources/views/**/*.blade.php',
         './resources/js/**/*.jsx',
     ],
-
+    darkMode: 'class', // Activer le mode sombre avec la classe 'dark'
+    
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Inter', 'sans-serif'],
             },
         },
     },
-
-    plugins: [require('@tailwindcss/forms')],
+    plugins: [],
 };
