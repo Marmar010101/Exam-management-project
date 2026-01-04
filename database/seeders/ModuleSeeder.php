@@ -17,13 +17,13 @@ class ModuleSeeder extends Seeder
     {
        $teachers = Teacher::all();
         $modules = [
-            ['module_name' => 'Algorithms', 'teacher_id' => $teachers->isNotEmpty() ? $teachers[0]->id : null,'group_id' => '1'],
-            ['module_name' => 'Data Structure', 'teacher_id' => $teachers->isNotEmpty() ? $teachers[1]->id ?? $teachers[0]->id : null,'group_id' => '1'],
-            ['module_name' => 'Database', 'teacher_id' => $teachers->isNotEmpty() ? $teachers[2]->id ?? $teachers[0]->id : null,'group_id' => '1'],
-            ['module_name' => 'Operating Systems', 'teacher_id' => $teachers->isNotEmpty() ? $teachers[3]->id ?? $teachers[0]->id : null,'group_id' => '1'],
-            ['module_name' => 'Analysis', 'teacher_id' => $teachers->isNotEmpty() ? $teachers[0]->id : null,'group_id' => '1'],
-            ['module_name' => 'algebra', 'teacher_id' => $teachers->isNotEmpty() ? $teachers[0]->id : null,'group_id' => '1'],
-            ['module_name' => 'physics', 'teacher_id' => $teachers->isNotEmpty() ? $teachers[0]->id : null,'group_id' => '1'],
+            ['module_name' => 'Algorithms', 'code' => 'ALG001', 'teacher_id' => $teachers->isNotEmpty() ? $teachers[0]->id : null],
+            ['module_name' => 'Data Structure', 'code' => 'DS002', 'teacher_id' => $teachers->isNotEmpty() ? $teachers[1]->id ?? $teachers[0]->id : null],
+            ['module_name' => 'Database', 'code' => 'DB003', 'teacher_id' => $teachers->isNotEmpty() ? $teachers[2]->id ?? $teachers[0]->id : null],
+            ['module_name' => 'Operating Systems', 'code' => 'OS004', 'teacher_id' => $teachers->isNotEmpty() ? $teachers[3]->id ?? $teachers[0]->id : null],
+            ['module_name' => 'Analysis', 'code' => 'ANL005', 'teacher_id' => $teachers->isNotEmpty() ? $teachers[0]->id : null],
+            ['module_name' => 'algebra', 'code' => 'ALG006', 'teacher_id' => $teachers->isNotEmpty() ? $teachers[0]->id : null],
+            ['module_name' => 'physics', 'code' => 'PHY007', 'teacher_id' => $teachers->isNotEmpty() ? $teachers[0]->id : null],
 
         ];
 
