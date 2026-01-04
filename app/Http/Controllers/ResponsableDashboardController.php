@@ -42,7 +42,7 @@ class ResponsableDashboardController extends Controller
             ->map(function ($exam) {
                 return [
                     'id' => $exam->id,
-                    'module_name' => $exam->module?->name ?? 'Unknown',
+                    'module_name' => $exam->module?->module_name ?? 'Unknown',
                     'group_name' => $exam->group?->name ?? 'Unknown',
                     'exam_date' => $exam->exame_date,
                     'formatted_date' => \Carbon\Carbon::parse($exam->exame_date)->format('M d'),

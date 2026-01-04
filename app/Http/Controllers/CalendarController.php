@@ -7,6 +7,8 @@ use App\Models\Exam;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+use Inertia\Inertia;
 
 class CalendarController extends Controller
 {
@@ -43,7 +45,7 @@ class CalendarController extends Controller
                         'exam_time' => $examTime,
                         'exam_type' => $exam->exam_type,
                         'module_id' => $exam->id_module,
-                        'module_name' => $exam->module->name ?? 'Unknown Module',
+                        'module_name' => $exam->module->module_name ?? 'Unknown Module',
                         'room_name' => $roomName,
                     ];
                 })->toArray();

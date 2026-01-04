@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Module;
 use App\Models\Room;
+use App\Models\Exam;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -14,36 +15,24 @@ class ExamController extends Controller
      */
     public function index()
     {
-        // Données fictives pour le moment - la table exams n'existe plus
-        $exams = [
-            [
-                'id' => 1,
-                'module' => 'Algorithmique et Structures de Données',
-                'date' => '2025-01-15',
-                'time' => '09:00',
-                'room' => 'A101',
-                'type' => 'Normal',
-                'duration' => 120
-            ],
-            [
-                'id' => 2,
-                'module' => 'Bases de Données',
-                'date' => '2025-01-20',
-                'time' => '14:00',
-                'room' => 'B201',
-                'type' => 'Rattrapage',
-                'duration' => 90
-            ],
-            [
-                'id' => 3,
-                'module' => 'Programmation Orientée Objet',
-                'date' => '2025-01-25',
-                'time' => '10:00',
-                'room' => 'C301',
-                'type' => 'Normal',
-                'duration' => 150
-            ]
-        ];
+        // Utiliser les vraies données des seeders
+        $exams = Exam::with(['module', 'group', 'teacher'])
+            ->orderBy('exame_date', 'desc')
+            ->orderBy('exame_time', 'desc')
+            ->get()
+            ->map(function ($exam) {
+                return [
+                    'id' => $exam->id,
+                    'module' => $exam->module->module_name ?? 'Unknown',
+                    'date' => $exam->exame_date,
+                    'time' => $exam->exame_time,
+                    'room' => 'A101', // Default room - could be enhanced
+                    'type' => $exam->exam_type,
+                    'duration' => 120, // Default duration
+                    'group' => $exam->group->name ?? 'Unknown',
+                    'teacher' => $exam->teacher->first_name . ' ' . $exam->teacher->last_name ?? 'Unknown',
+                ];
+            });
 
         $modules = Module::where(function($query) {
             $query->where('code', 'NOT LIKE', 'PMM%')
