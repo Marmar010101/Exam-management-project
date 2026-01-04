@@ -8,23 +8,20 @@ export default function Welcome(props) {
                 <div className="sm:fixed sm:top-0 sm:right-0 p-6 text-right">
                     {props.auth.user ? (
                         <Link
-                            href={route('dashboard')}
+                            href={
+                                props.auth.user.role === 'headdepartment' ? route('headdepartment.dashboard') :
+                                props.auth.user.role === 'responsable' ? route('responsable.dashboard') :
+                                props.auth.user.role === 'student' ? route('student.dashboard') :
+                                props.auth.user.role === 'teacher' ? route('teacher.dashboard') :
+                                route('login')
+                            }
                             className="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
                         >
                             Dashboard
                         </Link>
                     ) : (
                         <>
-                            
-                        </>
-                    )}
-                </div>
-
-              <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 dark:bg-gray-900 p-6">
-                <h1 className="text-4xl font-bold text-blue-600 mb-4">
-                    Welcome to our exam management app
-                </h1>
-                <Link
+                            <Link
                                 href={route('login')}
                                 className="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
                             >
@@ -37,9 +34,15 @@ export default function Welcome(props) {
                             >
                                 Register
                             </Link>
-                
+                        </>
+                    )}
                 </div>
-                
+
+                <div className="min-h-screen flex flex-col justify-center items-center p-6">
+                    <h1 className="text-4xl font-bold text-blue-600 mb-4">
+                        Welcome to our exam management app
+                    </h1>
+                </div>
             </div>
 
             <style>{`
