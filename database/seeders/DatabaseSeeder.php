@@ -37,6 +37,8 @@ class DatabaseSeeder extends Seeder
             ResponsableSeeder::class,
             ExamSeeder::class,
             InvigilationScheduleSeeder::class,
+            TeacherModuleSeeder::class,
+            TeacherExamSeeder::class,
         ]);
     }
 }
