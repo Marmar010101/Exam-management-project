@@ -15,10 +15,48 @@ class InvigilationController extends Controller
     {
         $schedules = InvigilationSchedule::with(['exam.module', 'exam.group', 'teacher.user'])
             ->orderBy('exam_date', 'desc')
-            ->paginate(15);
+            ->get()
+            ->map(function ($schedule) {
+                return [
+                    'id' => $schedule->id,
+                    'exam' => [
+                        'id' => $schedule->exam->id,
+                        'module_name' => $schedule->exam->module->name ?? 'Unknown',
+                        'group_name' => $schedule->exam->group->name ?? 'Unknown',
+                        'date' => $schedule->exam_date,
+                        'start_time' => $schedule->start_time,
+                        'end_time' => $schedule->end_time,
+                    ],
+                    'teacher' => [
+                        'id' => $schedule->teacher->id,
+                        'first_name' => $schedule->teacher->first_name,
+                        'last_name' => $schedule->teacher->last_name,
+                        'email' => $schedule->teacher->user->email ?? 'No Email',
+                    ],
+                    'room' => [
+                        'id' => $schedule->room_id,
+                        'name' => $schedule->room_name ?? 'No Room',
+                    ],
+                    'status' => $schedule->status ?? 'pending',
+                ];
+            });
 
-        return inertia('Invigilation/Index', [
-            'schedules' => $schedules
+        $stats = [
+            'total' => $schedules->count(),
+            'confirmed' => $schedules->where('status', 'confirmed')->count(),
+            'pending' => $schedules->where('status', 'pending')->count(),
+            'thisWeek' => $schedules->filter(function ($schedule) {
+                $examDate = \Carbon\Carbon::parse($schedule['exam']['date']);
+                return $examDate->between(now()->startOfWeek(), now()->endOfWeek());
+            })->count(),
+        ];
+
+        return inertia('Responsable/Invigilation/Index', [
+            'invigilations' => $schedules,
+            'stats' => $stats,
+            'auth' => [
+                'user' => auth()->user()
+            ]
         ]);
     }
 

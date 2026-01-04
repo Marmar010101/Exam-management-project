@@ -10,6 +10,16 @@ use App\Models\Exam;
 
 class ResponsableDashboardController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (auth()->check() && auth()->user()->role !== 'responsable') {
+                abort(403); 
+            }
+            return $next($request); 
+        });
+    }
+
     public function index()
     {
         $groups = Group::withCount(['students', 'modules', 'exams'])
@@ -23,20 +33,21 @@ class ResponsableDashboardController extends Controller
         $activePercentage = 95; // This could be dynamic
 
         // Get upcoming exams
-        $upcomingExams = Exam::where('exam_date', '>=', now())
+        $upcomingExams = Exam::where('exame_date', '>=', now())
             ->with(['module', 'group'])
-            ->orderBy('exam_date')
+            ->orderBy('exame_date')
+            ->orderBy('exame_time')
             ->limit(10)
             ->get()
             ->map(function ($exam) {
                 return [
                     'id' => $exam->id,
-                    'module_name' => $exam->module?->module_name ?? 'Unknown',
+                    'module_name' => $exam->module?->name ?? 'Unknown',
                     'group_name' => $exam->group?->name ?? 'Unknown',
-                    'exam_date' => $exam->exam_date,
-                    'formatted_date' => \Carbon\Carbon::parse($exam->exam_date)->format('M d'),
-                    'is_today' => $exam->exam_date == now()->format('Y-m-d'),
-                    'time_range' => $exam->exam_time . ' - ' . $exam->end_time,
+                    'exam_date' => $exam->exame_date,
+                    'formatted_date' => \Carbon\Carbon::parse($exam->exame_date)->format('M d'),
+                    'is_today' => $exam->exame_date == now()->format('Y-m-d'),
+                    'exam_time' => $exam->exame_time,
                 ];
             });
 

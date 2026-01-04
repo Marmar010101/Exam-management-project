@@ -36,7 +36,7 @@ export default function Index({ exams = [], stats = {}, error = null, auth }) {
             exam.module_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             exam.group_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             exam.exam_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            exam.rooms.some(room => room.name.toLowerCase().includes(searchTerm.toLowerCase()));
+            (exam.rooms && exam.rooms.some(room => room.name.toLowerCase().includes(searchTerm.toLowerCase())));
         
         let typeMatch = true;
         switch (filterType) {
@@ -55,19 +55,19 @@ export default function Index({ exams = [], stats = {}, error = null, auth }) {
 
     const handleDelete = (id, moduleName) => {
         if (confirm(`Are you sure you want to delete the exam for "${moduleName}"?\n\nThis action cannot be undone.`)) {
-            router.delete(route('exams.destroy', id));
+            router.delete(route('responsable.exams.destroy', id));
         }
     };
 
     // Safe route check function
     const getExamDetailRoute = (examId) => {
         try {
-            // First try exams.show
-            return route('exams.show', examId);
+            // First try responsable.exams.show
+            return route('responsable.exams.show', examId);
         } catch (error) {
             try {
-                // Fallback to exams.edit
-                return route('exams.edit', examId);
+                // Fallback to responsable.exams.edit
+                return route('responsable.exams.edit', examId);
             } catch (error) {
                 // Last resort, use #
                 return '#';
@@ -94,7 +94,7 @@ export default function Index({ exams = [], stats = {}, error = null, auth }) {
                                 </p>
                             </div>
                             <Link
-                                href={route('exams.create')}
+                                href={route('responsable.exams.create')}
                                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                             >
                                 <PlusCircle className="h-4 w-4 mr-2" />
@@ -253,34 +253,15 @@ export default function Index({ exams = [], stats = {}, error = null, auth }) {
                                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                                                         <div className="flex items-center gap-2 text-gray-600">
                                                             <Calendar className="h-4 w-4" />
-                                                            <span>{exam.formatted_date}</span>
+                                                            <span>{exam.exam_date}</span>
                                                         </div>
                                                         <div className="flex items-center gap-2 text-gray-600">
                                                             <Clock className="h-4 w-4" />
-                                                            <span>{exam.time_range} ({exam.duration} min)</span>
+                                                            <span>{exam.exam_time}</span>
                                                         </div>
                                                         <div className="flex items-center gap-2 text-gray-600">
                                                             <Users className="h-4 w-4" />
                                                             <span>{exam.group_name}</span>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div className="mt-2 flex flex-wrap gap-2">
-                                                        <div className="flex items-center gap-1 text-sm text-gray-500">
-                                                            <Building className="h-4 w-4" />
-                                                            <span>System: {exam.system}</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1 text-sm text-gray-500">
-                                                            <GraduationCap className="h-4 w-4" />
-                                                            <span>Level: {exam.level}</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1 text-sm text-gray-500">
-                                                            <BookOpen className="h-4 w-4" />
-                                                            <span>Speciality: {exam.speciality}</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1 text-sm text-gray-500">
-                                                            <Calendar className="h-4 w-4" />
-                                                            <span>Semester: {exam.semester}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -302,94 +283,6 @@ export default function Index({ exams = [], stats = {}, error = null, auth }) {
                                                 </div>
                                             </div>
                                         </div>
-                                        
-                                        {/* Expanded Details */}
-                                        {expandedExam === exam.id && (
-                                            <div className="px-4 pb-4 pt-0 border-t border-gray-200">
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                                                    {/* Rooms Section */}
-                                                    <div>
-                                                        <h4 className="font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                                            <MapPin className="h-4 w-4" />
-                                                            Assigned Rooms ({exam.total_rooms})
-                                                        </h4>
-                                                        {exam.rooms.length > 0 ? (
-                                                            <div className="space-y-2">
-                                                                {exam.rooms.map((room) => (
-                                                                    <div key={room.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                                                        <div>
-                                                                            <div className="font-medium">{room.name}</div>
-                                                                            <div className="text-sm text-gray-600">
-                                                                                {room.type} • Capacity: {room.capacity}
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className={`px-2 py-1 text-xs rounded-full ${
-                                                                            room.availability ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                                                        }`}>
-                                                                            {room.availability ? 'Available' : 'Unavailable'}
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        ) : (
-                                                            <p className="text-gray-500 text-sm">No rooms assigned yet</p>
-                                                        )}
-                                                    </div>
-                                                    
-                                                    {/* Invigilators Section */}
-                                                    <div>
-                                                        <h4 className="font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                                            <Users className="h-4 w-4" />
-                                                            Invigilators ({exam.total_invigilators})
-                                                        </h4>
-                                                        {exam.teachers.length > 0 ? (
-                                                            <div className="space-y-2">
-                                                                {exam.teachers.map((teacher) => (
-                                                                    <div key={teacher.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                                                        <div>
-                                                                            <div className="font-medium">{teacher.name}</div>
-                                                                            <div className="text-sm text-gray-600">{teacher.email}</div>
-                                                                        </div>
-                                                                        {teacher.id === exam.module_responsible_id && (
-                                                                            <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
-                                                                                Responsible
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        ) : (
-                                                            <p className="text-gray-500 text-sm">No invigilators assigned yet</p>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                
-                                                {/* Actions */}
-                                                <div className="mt-6 pt-4 border-t border-gray-200 flex justify-between">
-                                                    <div className="text-sm text-gray-500">
-                                                        Module Responsible: <span className="font-medium">{exam.module_responsible}</span>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        {route().has('exams.edit') && (
-                                                            <Link
-                                                                href={route('exams.edit', exam.id)}
-                                                                className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
-                                                            >
-                                                                <Edit className="h-4 w-4" />
-                                                                Edit
-                                                            </Link>
-                                                        )}
-                                                        <button
-                                                            onClick={() => handleDelete(exam.id, exam.module_name)}
-                                                            className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-red-300 text-red-600 rounded-lg hover:bg-red-50"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -408,11 +301,11 @@ export default function Index({ exams = [], stats = {}, error = null, auth }) {
                                 </p>
                                 {(!searchTerm && filterType === 'all') && (
                                     <Link
-                                        href={route('exams.create')}
+                                        href={route('responsable.exams.create')}
                                         className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                                     >
                                         <PlusCircle className="h-5 w-5 mr-2" />
-                                        Schedule Your First Exam
+                                        Schedule New Exam
                                     </Link>
                                 )}
                             </div>

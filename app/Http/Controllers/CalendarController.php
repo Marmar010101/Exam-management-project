@@ -18,19 +18,15 @@ class CalendarController extends Controller
 
         $examsByGroup = [];
         foreach ($groups as $group) {
-            $exams = Exam::where('group_id', $group->id)
-                ->with(['module:id,module_name', 'rooms:id,room_name'])
-                ->orderBy('exam_date')
-                ->orderBy('exam_time')
+            $exams = Exam::where('id_group', $group->id)
+                ->with(['module:id,module_name'])
+                ->orderBy('exame_date')
+                ->orderBy('exame_time')
                 ->get()
                 ->map(function($exam) {
                     $roomName = 'No Room';
-                    if ($exam->rooms && $exam->rooms->isNotEmpty()) {
-                        $firstRoom = $exam->rooms->first();
-                        $roomName = $firstRoom->room_name ?? 'No Room';
-                    }
-
-                    $examTime = $exam->exam_time;
+                    
+                    $examTime = $exam->exame_time;
                     if ($examTime) {
                         try {
                             $examTime = Carbon::parse($examTime)->format('H:i');
@@ -43,15 +39,12 @@ class CalendarController extends Controller
 
                     return [
                         'id' => $exam->id,
-                        'exam_date' => $exam->exam_date,
+                        'exam_date' => $exam->exame_date,
                         'exam_time' => $examTime,
-                        'end_time' => $exam->end_time,
-                        'duration' => $exam->duration,
                         'exam_type' => $exam->exam_type,
-                        'module_id' => $exam->module_id,
-                        'module_name' => $exam->module->module_name ?? 'Unknown Module',
+                        'module_id' => $exam->id_module,
+                        'module_name' => $exam->module->name ?? 'Unknown Module',
                         'room_name' => $roomName,
-                        'exam_type' => $exam->exam_type,
                     ];
                 })->toArray();
 

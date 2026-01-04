@@ -83,13 +83,15 @@ export default function PlanningCalendar({ planning, group, auth }) {
     };
 
     const handleExport = () => {
-        const url = route('calendars.export.group.pdf', { group: group.id });
-        window.open(url, '_blank');
+        if (group && group.id) {
+            const url = route('calendars.export.group.pdf', { group: group.id });
+            window.open(url, '_blank');
+        }
     };
 
     // Get date range for display
     const getDateRange = () => {
-        if (planning.length === 0) return '';
+        if (!planning || planning.length === 0) return '';
         
         const dates = planning.map(e => new Date(e.exam_date));
         const minDate = new Date(Math.min(...dates));
@@ -148,10 +150,10 @@ export default function PlanningCalendar({ planning, group, auth }) {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-2xl font-bold text-gray-900">
-                                Exam Calendar: {group.name}
+                                Exam Calendar{group && group.name ? `: ${group.name}` : ''}
                             </h1>
                             <p className="text-gray-600 mt-1">
-                                {planning.length} exams scheduled • {getDateRange()}
+                                {planning && planning.length ? `${planning.length} exams scheduled • ${getDateRange()}` : 'No exams scheduled'}
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
@@ -178,7 +180,7 @@ export default function PlanningCalendar({ planning, group, auth }) {
                                 Print
                             </button>
                             <Link
-                                href={route('session.planning.create', { group: group.id })}
+                                href={group && group.id ? route('session.planning.create', { group: group.id }) : '#'}
                                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
                             >
                                 <CalendarDays className="h-4 w-4" />
@@ -190,7 +192,7 @@ export default function PlanningCalendar({ planning, group, auth }) {
 
                 {/* Calendar - Full Width */}
                 <div className="bg-white rounded-xl shadow border border-gray-200 p-4">
-                    {planning.length === 0 ? (
+                    {!planning || planning.length === 0 ? (
                         <div className="text-center py-12">
                             <CalendarDays className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                             <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -200,7 +202,7 @@ export default function PlanningCalendar({ planning, group, auth }) {
                                 Create a session planning to schedule exams for this group.
                             </p>
                             <Link
-                                href={route('session.planning.create', { group: group.id })}
+                                href={group && group.id ? route('session.planning.create', { group: group.id }) : '#'}
                                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                             >
                                 <CalendarDays className="h-4 w-4 mr-2" />
@@ -237,7 +239,7 @@ export default function PlanningCalendar({ planning, group, auth }) {
                 </div>
 
                 {/* Legend */}
-                {planning.length > 0 && (
+                {planning && planning.length > 0 && (
                     <div className="mt-6 bg-white rounded-lg border border-gray-200 p-4">
                         <h3 className="font-medium text-gray-900 mb-3">Exam Type Legend</h3>
                         <div className="flex flex-wrap gap-3">
@@ -267,7 +269,8 @@ export default function PlanningCalendar({ planning, group, auth }) {
             </div>
 
             {/* Custom CSS for FullCalendar */}
-            <style jsx global>{`
+            <style dangerouslySetInnerHTML={{
+                __html: `
                 /* Make events fill the entire day cell */
                 .fc-daygrid-event {
                     margin: 1px 0 !important;
@@ -316,28 +319,29 @@ export default function PlanningCalendar({ planning, group, auth }) {
                     width: 24px !important;
                     height: 24px !important;
                     display: flex !important;
-                                    align-items: center !important;
-                                    justify-content: center !important;
-                                }
-                                
-                                /* Hover effect for events */
-                                .fc-daygrid-event:hover {
-                                    opacity: 0.9 !important;
-                                    transform: translateY(-1px) !important;
-                                    transition: all 0.2s ease !important;
-                                    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-                                }
-                                
-                                /* Make more link smaller */
-                                .fc-daygrid-more-link {
-                                    font-size: 11px !important;
-                                    color: #6b7280 !important;
-                                    padding: 2px 4px !important;
-                                    background-color: #f3f4f6 !important;
-                                    border-radius: 4px !important;
-                                    margin-top: 2px !important;
-                                }
-                            `}</style>
-                        </AuthenticatedLayout>
-                    );
+                    align-items: center !important;
+                    justify-content: center !important;
                 }
+                
+                /* Hover effect for events */
+                .fc-daygrid-event:hover {
+                    opacity: 0.9 !important;
+                    transform: translateY(-1px) !important;
+                    transition: all 0.2s ease !important;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+                }
+                
+                /* Make more link smaller */
+                .fc-daygrid-more-link {
+                    font-size: 11px !important;
+                    color: #6b7280 !important;
+                    padding: 2px 4px !important;
+                    background-color: #f3f4f6 !important;
+                    border-radius: 4px !important;
+                    margin-top: 2px !important;
+                }
+                `
+            }} />
+        </AuthenticatedLayout>
+    );
+}

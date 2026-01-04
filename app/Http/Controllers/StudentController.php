@@ -6,7 +6,17 @@ use Inertia\Inertia;
 
 class StudentController extends Controller
 {
-    public function dashboard()
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (auth()->check() && auth()->user()->role !== 'student') {
+                abort(403); 
+            }
+            return $next($request); 
+        });
+    }
+
+    public function index()
     {
         return Inertia::render('Student/Dashboard');
     }

@@ -40,8 +40,8 @@ export default function Sidebar({ role, isMobile = false, onClose }) {
     {
         key: 'exam_plans',
         label: 'Exam Plans',
-        route: 'responsable.exam_plans',
-        icon: <FileText size={18} />,
+        route: 'responsable.planning.calendar',
+        icon: <Calendar size={18} />,
     },
     {
         key: 'exams',
@@ -58,7 +58,7 @@ export default function Sidebar({ role, isMobile = false, onClose }) {
     {
         key: 'calendars',
         label: 'Calendars',
-        route: 'calendars.index',
+        route: 'responsable.calendars',
         icon: <CalendarDays size={18} />,
     },
 ],

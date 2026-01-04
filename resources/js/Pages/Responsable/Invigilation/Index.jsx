@@ -414,7 +414,7 @@ export default function InvigilationIndex({
                             <p className="text-lg font-medium mb-2">No exams found</p>
                             <p className="text-gray-600 mb-4">Try adjusting your filters or create some exams first.</p>
                             <button
-                                onClick={() => router.get('/exams/create')}
+                                onClick={() => router.get(route('responsable.exams.create'))}
                                 className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:opacity-90 flex items-center gap-2 mx-auto"
                             >
                                 <Settings className="h-4 w-4" />
