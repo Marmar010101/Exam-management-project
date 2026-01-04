@@ -58,18 +58,16 @@ class StudentSeeder extends Seeder
                 'role'      => 'student',
             ]);
 
-            //$level = Level::where('name', $s['level'])->first();
-            //$semester = Semester::where('name', $s['semester'])->first();
-            $group = Group::where('name', $s['group'])->first();
+            $group = Group::where('name', 'like', '%' . $s['group'] . '%')->first();
 
-          /*  if ($level && $semester) {
+            if ($group) {
                 Student::create([
                     'user_id'     => $user->id,
-                    'level_id'    => $level->id,
-                    'semester_id' => $semester->id,
-                    'group_id'    => $group?->id,
+                    'level_id'    => $group->level_id,
+                    'semester_id' => $group->semester_id,
+                    'group_id'    => $group->id,
                 ]);
-            }*/
+            }
         }
     }
 }
