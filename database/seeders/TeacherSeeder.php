@@ -27,6 +27,10 @@ class TeacherSeeder extends Seeder
             'first_name' => 'Mohammed',
             'last_name'  => 'Benkhelifa',
             'grade'      => 'MAA',
+            'is_responsable' => true,
+            'unavailable_dates' => ['2025-01-10', '2025-01-12'],
+            'max_exams_per_day' => 2,
+            'max_exams_per_week' => 5,
         ]);
 
         // Teacher 2
@@ -41,6 +45,10 @@ class TeacherSeeder extends Seeder
             'first_name' => 'Asma',
             'last_name'  => 'Brahimi',
             'grade'      => 'MAB',
+            'is_responsable' => false,
+            'unavailable_dates' => ['2025-01-15'],
+            'max_exams_per_day' => 1,
+            'max_exams_per_week' => 4,
         ]);
 
         // Teacher 3
@@ -55,6 +63,10 @@ class TeacherSeeder extends Seeder
             'first_name' => 'Sara',
             'last_name'  => 'Moussa',
             'grade'      => 'MAA',
+            'is_responsable' => false,
+            'unavailable_dates' => ['2025-01-15'],
+            'max_exams_per_day' => 1,
+            'max_exams_per_week' => 4,
         ]);
     }
 }
