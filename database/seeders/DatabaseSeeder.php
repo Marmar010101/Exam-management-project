@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             SemesterSeeder::class,
             SpecialitySeeder::class,
             GroupSeeder::class,
+            GroupModuleSeeder::class,
             TeacherSeeder::class,
             ModuleSeeder::class,
             StudentSeeder::class,

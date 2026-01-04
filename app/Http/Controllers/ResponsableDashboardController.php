@@ -70,6 +70,9 @@ class ResponsableDashboardController extends Controller
 
         return Inertia::render('Responsable/GroupsIndex', [
             'groups' => $groups,
+            'auth' => [
+                'user' => auth()->user()
+            ]
         ]);
     }
 }
