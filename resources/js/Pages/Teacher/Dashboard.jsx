@@ -106,8 +106,8 @@ export default function TeacherDashboard({
     };
 
     return (
-        <AuthenticatedLayout header="Tableau de bord">
-            <Head title="Tableau de bord Enseignant" />
+        <AuthenticatedLayout header="Teacher Dashboard">
+            <Head title="Teacher Dashboard" />
             
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Statistics Cards - Read Only */}
