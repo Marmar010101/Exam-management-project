@@ -66,10 +66,6 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/Student/Dashboard', [StudentController::class, 'dashboard'])
         ->name('student.dashboard');
-    
-    Route::get('/Teacher/Dashboard', function () {
-        return Inertia::render('Teacher/Dashboard');
-    })->name('teacher.dashboard');
 
     // Student routes
     Route::get('/Student/MyExams', [StudentController::class, 'myExams'])->name('student.my_exams');

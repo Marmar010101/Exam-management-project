@@ -19,11 +19,32 @@ class TeacherController extends Controller
 
     public function index()
     {
-        return Inertia::render('Teacher/Dashboard', [
-            'auth' => [
-                'user' => auth()->user()
-            ]
-        ]);
+        try {
+            $user = auth()->user();
+            return Inertia::render('Teacher/Dashboard', [
+                'auth' => [
+                    'user' => $user
+                ],
+                'stats' => [
+                    'totalModules' => 4,
+                    'totalSurveillances' => 6,
+                    'upcomingExams' => 3,
+                    'attendanceRate' => 87
+                ],
+                'recentAlerts' => [],
+                'upcomingExams' => []
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Teacher Dashboard Error: ' . $e->getMessage());
+            return Inertia::render('Teacher/Dashboard', [
+                'auth' => [
+                    'user' => auth()->user()
+                ],
+                'stats' => [],
+                'recentAlerts' => [],
+                'upcomingExams' => []
+            ]);
+        }
     }
 
     public function surveillance()
