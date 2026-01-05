@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
     Clock,
@@ -7,27 +7,41 @@ import {
     AlertTriangle,
     CheckCircle,
     XCircle,
-    Eye,
-    Filter,
-    Search
+    Search,
+    User,
+    FileText
 } from 'lucide-react';
 
-export default function HeadDepartmentTeacherRequests({ 
+export default function TeacherRequests({ 
     requests = [],
-    user = null 
+    stats = {}
 }) {
     const { flash } = usePage().props;
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
 
     const handleStatusUpdate = (requestId, newStatus) => {
-        if (confirm(`Êtes-vous sûr de vouloir ${newStatus === 'approved' ? 'approuver' : newStatus === 'rejected' ? 'refuser' : 'mettre en attente'} cette demande ?`)) {
+        if (confirm(`Are you sure you want to ${newStatus === 'approved' ? 'approve' : newStatus === 'rejected' ? 'reject' : 'set to pending'} this request?`)) {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = route('headdepartment.teacher_requests.update', requestId);
+            form.action = route('responsable.teacher_requests.update', requestId);
             
             const formData = new FormData();
             formData.append('status', newStatus);
+            formData.append('_method', 'PUT');
+            
+            form.submit();
+        }
+    };
+
+    const handleDelete = (requestId) => {
+        if (confirm('Are you sure you want to delete this request?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = route('responsable.teacher_requests.destroy', requestId);
+            
+            const formData = new FormData();
+            formData.append('_method', 'DELETE');
             
             form.submit();
         }
@@ -36,9 +50,9 @@ export default function HeadDepartmentTeacherRequests({
     const getTypeLabel = (type) => {
         switch (type) {
             case 'absence': return 'Absence';
-            case 'delay_date': return 'Changement de date';
-            case 'delay_duration': return 'Changement de durée';
-            case 'other': return 'Autre';
+            case 'room_change': return 'Room Change';
+            case 'time_change': return 'Time Change';
+            case 'exam_change': return 'Exam Change';
             default: return type;
         }
     };
@@ -49,6 +63,15 @@ export default function HeadDepartmentTeacherRequests({
             case 'approved': return <CheckCircle className="text-green-600" size={16} />;
             case 'rejected': return <XCircle className="text-red-600" size={16} />;
             default: return <Clock className="text-gray-600" size={16} />;
+        }
+    };
+
+    const getStatusLabel = (status) => {
+        switch (status) {
+            case 'pending': return 'Pending';
+            case 'approved': return 'Approved';
+            case 'rejected': return 'Rejected';
+            default: return status;
         }
     };
 
@@ -70,24 +93,27 @@ export default function HeadDepartmentTeacherRequests({
         }
     };
 
+    const getUrgencyLabel = (urgency) => {
+        switch (urgency) {
+            case 'high': return 'High';
+            case 'normal': return 'Normal';
+            case 'low': return 'Low';
+            default: return urgency;
+        }
+    };
+
     // Filter requests
     const filteredRequests = requests.filter(request => {
         const matchesSearch = request.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           (request.user?.name && request.user.name.toLowerCase().includes(searchTerm.toLowerCase()));
+                           (request.teacher_name && request.teacher_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                           (request.description && request.description.toLowerCase().includes(searchTerm.toLowerCase()));
         const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
         return matchesSearch && matchesStatus;
     });
 
-    const stats = {
-        total: requests.length,
-        pending: requests.filter(r => r.status === 'pending').length,
-        approved: requests.filter(r => r.status === 'approved').length,
-        rejected: requests.filter(r => r.status === 'rejected').length
-    };
-
     return (
-        <AuthenticatedLayout header="Gestion des Demandes">
-            <Head title="Gestion des Demandes" />
+        <AuthenticatedLayout header="Teacher Requests Management">
+            <Head title="Teacher Requests Management" />
             
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Success Message */}
@@ -106,7 +132,7 @@ export default function HeadDepartmentTeacherRequests({
                             </div>
                             <div className="ml-4">
                                 <p className="text-sm font-medium text-gray-600">Total</p>
-                                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                                <p className="text-2xl font-bold text-gray-900">{stats.total_requests || 0}</p>
                             </div>
                         </div>
                     </div>
@@ -116,8 +142,8 @@ export default function HeadDepartmentTeacherRequests({
                                 <Clock className="text-yellow-600" size={24} />
                             </div>
                             <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-600">En attente</p>
-                                <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
+                                <p className="text-sm font-medium text-gray-600">Pending</p>
+                                <p className="text-2xl font-bold text-gray-900">{stats.pending_requests || 0}</p>
                             </div>
                         </div>
                     </div>
@@ -127,8 +153,8 @@ export default function HeadDepartmentTeacherRequests({
                                 <CheckCircle className="text-green-600" size={24} />
                             </div>
                             <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-600">Approuvées</p>
-                                <p className="text-2xl font-bold text-gray-900">{stats.approved}</p>
+                                <p className="text-sm font-medium text-gray-600">Approved</p>
+                                <p className="text-2xl font-bold text-gray-900">{stats.approved_requests || 0}</p>
                             </div>
                         </div>
                     </div>
@@ -138,8 +164,8 @@ export default function HeadDepartmentTeacherRequests({
                                 <XCircle className="text-red-600" size={24} />
                             </div>
                             <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-600">Refusées</p>
-                                <p className="text-2xl font-bold text-gray-900">{stats.rejected}</p>
+                                <p className="text-sm font-medium text-gray-600">Rejected</p>
+                                <p className="text-2xl font-bold text-gray-900">{stats.rejected_requests || 0}</p>
                             </div>
                         </div>
                     </div>
@@ -147,164 +173,167 @@ export default function HeadDepartmentTeacherRequests({
 
                 {/* Filters */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex flex-col md:flex-row gap-4">
                         <div className="flex-1">
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                                 <input
                                     type="text"
-                                    placeholder="Rechercher par titre ou enseignant..."
+                                    placeholder="Search requests..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
                         </div>
-                        <div className="sm:w-48">
+                        <div className="flex gap-2">
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             >
-                                <option value="all">Tous les statuts</option>
-                                <option value="pending">En attente</option>
-                                <option value="approved">Approuvées</option>
-                                <option value="rejected">Refusées</option>
+                                <option value="all">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
-                {/* Requests List */}
+                {/* Requests Table */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                    <div className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Liste des demandes</h3>
-                        
-                        {filteredRequests.length === 0 ? (
-                            <div className="text-center py-8">
-                                <AlertTriangle className="text-gray-400 mx-auto mb-3" size={48} />
-                                <p className="text-gray-500">Aucune demande trouvée</p>
-                            </div>
-                        ) : (
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-gray-50">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Enseignant
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Type
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Titre
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Date
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Urgence
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Statut
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Date de réponse
-                                            </th>
-                                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Actions
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                        {filteredRequests.map((request) => (
-                                            <tr key={request.id} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-gray-900">
-                                                        {request.user?.name || 'N/A'}
+                    <div className="px-6 py-4 border-b border-gray-200">
+                        <h3 className="text-lg font-semibold text-gray-900">All Teacher Requests</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Teacher
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Type
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Title
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Date
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Urgency
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {filteredRequests.length > 0 ? (
+                                    filteredRequests.map((request) => (
+                                        <tr key={request.id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center">
+                                                    <User className="h-8 w-8 text-gray-400 mr-3" />
+                                                    <div>
+                                                        <div className="text-sm font-medium text-gray-900">
+                                                            {request.teacher_name}
+                                                        </div>
+                                                        <div className="text-xs text-gray-500">
+                                                            {request.teacher_email}
+                                                        </div>
                                                     </div>
-                                                    <div className="text-sm text-gray-500">
-                                                        {request.user?.email || ''}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className="text-sm text-gray-900">
-                                                        {getTypeLabel(request.type)}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="text-sm font-medium text-gray-900">
-                                                        {request.title}
-                                                    </div>
-                                                    {request.module && (
-                                                        <div className="text-sm text-gray-500">
-                                                            Module: {request.module.name}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    {getTypeLabel(request.type)}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm text-gray-900">
+                                                    <div className="font-medium">{request.title}</div>
+                                                    {request.description && (
+                                                        <div className="text-gray-500 text-xs mt-1 line-clamp-2">
+                                                            {request.description}
                                                         </div>
                                                     )}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {request.date ? new Date(request.date).toLocaleDateString('fr-FR') : '-'}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`px-2 py-1 text-xs rounded-full border ${getUrgencyColor(request.urgency)}`}>
-                                                        {request.urgency === 'high' ? 'Urgent' : 
-                                                         request.urgency === 'normal' ? 'Normal' : 'Faible'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {request.date ? (
                                                     <div className="flex items-center">
-                                                        {getStatusIcon(request.status)}
-                                                        <span className={`ml-2 px-2 py-1 text-xs rounded-full border ${getStatusColor(request.status)}`}>
-                                                            {request.status === 'pending' ? 'En attente' :
-                                                             request.status === 'approved' ? 'Acceptée' : 'Refusée'}
-                                                        </span>
+                                                        <Calendar className="h-4 w-4 mr-2" />
+                                                        {request.date}
+                                                        {request.time && <span className="ml-2">{request.time}</span>}
                                                     </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {request.response_date ? 
-                                                        new Date(request.response_date).toLocaleDateString('fr-FR') : '-'}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    {/* Show details button */}
-                                                    <button className="text-blue-600 hover:text-blue-900 mr-2">
-                                                        <Eye size={16} />
-                                                    </button>
-                                                    
-                                                    {/* Action buttons for Head Department */}
+                                                ) : (
+                                                    '-'
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getUrgencyColor(request.urgency)}`}>
+                                                    {request.urgency && getUrgencyLabel(request.urgency)}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center">
+                                                    {getStatusIcon(request.status)}
+                                                    <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
+                                                        {getStatusLabel(request.status)}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <div className="flex items-center space-x-2">
                                                     {request.status === 'pending' && (
                                                         <>
-                                                            <button 
+                                                            <button
                                                                 onClick={() => handleStatusUpdate(request.id, 'approved')}
-                                                                className="text-green-600 hover:text-green-900 mr-2"
-                                                                title="Approuver"
+                                                                className="text-green-600 hover:text-green-900 font-medium"
                                                             >
-                                                                <CheckCircle size={16} />
+                                                                Approve
                                                             </button>
-                                                            <button 
+                                                            <button
                                                                 onClick={() => handleStatusUpdate(request.id, 'rejected')}
-                                                                className="text-red-600 hover:text-red-900"
-                                                                title="Refuser"
+                                                                className="text-red-600 hover:text-red-900 font-medium"
                                                             >
-                                                                <XCircle size={16} />
+                                                                Reject
                                                             </button>
                                                         </>
                                                     )}
-                                                    {request.status !== 'pending' && (
-                                                        <button 
-                                                            onClick={() => handleStatusUpdate(request.id, 'pending')}
-                                                            className="text-yellow-600 hover:text-yellow-900"
-                                                            title="Mettre en attente"
-                                                        >
-                                                            <Clock size={16} />
-                                                        </button>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
+                                                    <button
+                                                        onClick={() => handleDelete(request.id)}
+                                                        className="text-gray-600 hover:text-gray-900 font-medium"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="7" className="px-6 py-12 text-center">
+                                            <div className="flex flex-col items-center">
+                                                <FileText className="h-12 w-12 text-gray-400 mb-4" />
+                                                <p className="text-gray-500 text-lg font-medium">No requests found</p>
+                                                <p className="text-gray-400 text-sm mt-2">
+                                                    {searchTerm || statusFilter !== 'all' 
+                                                        ? 'Try adjusting your search or filter criteria' 
+                                                        : 'No teacher requests have been submitted yet'}
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

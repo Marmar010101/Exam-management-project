@@ -1,6 +1,14 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { FileBarChart, Users, Calendar, BookOpen, Clock, TrendingUp } from 'lucide-react';
+import { 
+    FileBarChart, 
+    Users, 
+    Calendar, 
+    BookOpen, 
+    Building, 
+    Clock,
+    TrendingUp
+} from 'lucide-react';
 
 export default function Report({ stats, groups, upcomingExams }) {
     return (
