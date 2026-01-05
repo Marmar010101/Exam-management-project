@@ -116,7 +116,7 @@ export default function Dashboard({
                                                 </div>
                                             </div>
                                             <Link
-                                                href={route('responsable.groups.index')}
+                                                href={route('responsable.groups')}
                                                 className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center"
                                             >
                                                 View Details
@@ -127,7 +127,7 @@ export default function Dashboard({
                                 </div>
                                 <div className="text-center mt-4">
                                     <Link
-                                        href={route('responsable.groups.index')}
+                                        href={route('responsable.groups')}
                                         className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
                                     >
                                         View All Groups
@@ -160,7 +160,7 @@ export default function Dashboard({
                             </Link>
 
                             <Link
-                                href={route('responsable.calendars')}
+                                href={route('responsable.planning.calendar')}
                                 className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow group"
                             >
                                 <div className="flex items-center">
