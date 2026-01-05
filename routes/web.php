@@ -278,7 +278,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('headdepartment/exam-plans')->group(function () {
         Route::get('/', [HeaddepartmentExamPlanController::class, 'index'])->name('headdepartment.exam-plans.index');
         Route::get('/{examPlan}', [HeaddepartmentExamPlanController::class, 'show'])->name('headdepartment.exam-plans.show');
-        Route::post('/{examPlan}/validate', [HeaddepartmentExamPlanController::class, 'validate'])->name('headdepartment.exam-plans.validate');
+        Route::post('/{examPlan}/validate', [HeaddepartmentExamPlanController::class, 'validateExamPlan'])->name('headdepartment.exam-plans.validate');
         Route::get('/all', [HeaddepartmentExamPlanController::class, 'all'])->name('headdepartment.exam-plans.all');
     });
     

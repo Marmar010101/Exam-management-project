@@ -99,7 +99,7 @@ class ExamPlanController extends Controller
     /**
      * Validate the exam plan.
      */
-    public function validate(Request $request, $id)
+    public function validateExamPlan(Request $request, $id)
     {
         $examPlan = ExamPlan::findOrFail($id);
 
