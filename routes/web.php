@@ -12,7 +12,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ExamsPlanningController;
-use App\Http\Controllers\TeacherRequestController;
+use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TeacherAlertController;
 use App\Http\Controllers\TeacherSurveillanceController;
 use App\Http\Controllers\TeacherExamController;
@@ -72,10 +72,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/Student/Calendar', [StudentController::class, 'calendar'])->name('student.calendar');
 
     // Teacher routes
-    Route::get('/Teacher/requests', [TeacherRequestController::class, 'index'])->name('teacher.requests');
-    Route::post('/Teacher/requests', [TeacherRequestController::class, 'store'])->name('teacher.requests.store');
-    Route::put('/Teacher/requests/{teacherRequest}', [TeacherRequestController::class, 'update'])->name('teacher.requests.update');
-    Route::delete('/Teacher/requests/{teacherRequest}', [TeacherRequestController::class, 'destroy'])->name('teacher.requests.destroy');
     Route::get('/Teacher/alerts', [TeacherAlertController::class, 'index'])->name('teacher.alerts');
     Route::post('/Teacher/alerts', [TeacherAlertController::class, 'store'])->name('teacher.alerts.store');
     Route::get('/Teacher/surveillance', [TeacherSurveillanceController::class, 'index'])->name('teacher.surveillance');
@@ -96,11 +92,11 @@ Route::middleware('auth')->group(function () {
         ->name('headdepartment.exams.update');
     Route::delete('/headdepartment/exams/{exam}', [ExamController::class, 'destroy'])
         ->name('headdepartment.exams.destroy');
-    Route::get('/headdepartment/teacher-requests', [TeacherRequestController::class, 'headDepartmentIndex'])
+    Route::get('/headdepartment/teacher-requests', [\App\Http\Controllers\Headdepartment\TeacherRequestController::class, 'index'])
         ->name('headdepartment.teacher_requests');
-    Route::put('/headdepartment/teacher-requests/{teacherRequest}', [TeacherRequestController::class, 'update'])
+    Route::put('/headdepartment/teacher-requests/{teacherRequest}', [\App\Http\Controllers\Headdepartment\TeacherRequestController::class, 'update'])
         ->name('headdepartment.teacher_requests.update');
-    Route::delete('/headdepartment/teacher-requests/{teacherRequest}', [TeacherRequestController::class, 'destroy'])
+    Route::delete('/headdepartment/teacher-requests/{teacherRequest}', [\App\Http\Controllers\Headdepartment\TeacherRequestController::class, 'destroy'])
         ->name('headdepartment.teacher_requests.destroy');
     Route::get('/headdepartment/modules', [ModuleController::class, 'index'])
         ->name('headdepartment.modules');
@@ -212,13 +208,15 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Responsable/SessionPlanning');
     })->name('responsable.session.planning');
     
-    // Session planning routes
+    // Session planning routes (commented for now - controller missing)
+    /*
     Route::get('/responsable/session-planning/{group}', [SessionPlanningController::class, 'create'])
         ->name('session.planning.create');
     Route::post('/responsable/session-planning', [SessionPlanningController::class, 'store'])
         ->name('session.planning.store');
     Route::get('/groups/{group}/planning-calendar', [SessionPlanningController::class, 'showCalendar'])
         ->name('planning.calendar');
+    */
 
     // Exam routes with additional functionality
     Route::post('/exams/check-availability', [ExamController::class, 'checkAvailability'])->name('exams.check-availability');
