@@ -143,29 +143,32 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Responsable/GroupsIndex');
     })->name('responsable.groups');
 
-    Route::get('Responsable/Exams/Index', [\App\Http\Controllers\Responsable\ExamController::class, 'index'])
+    Route::get('Responsable/Exams/Index', [\App\Http\Controllers\Headdepartment\ExamController::class, 'index'])
         ->name('responsable.exams');
 
-    Route::get('/Responsable/Exams/Create', [\App\Http\Controllers\Responsable\ExamController::class, 'create'])
+    Route::get('/Responsable/Exams/Create', [\App\Http\Controllers\Headdepartment\ExamController::class, 'create'])
         ->name('responsable.exams.create');
 
-    Route::post('/Responsable/Exams', [\App\Http\Controllers\Responsable\ExamController::class, 'store'])
+    Route::post('/Responsable/Exams', [\App\Http\Controllers\Headdepartment\ExamController::class, 'store'])
         ->name('responsable.exams.store');
 
-    Route::get('/Responsable/Exams/{exam}', [\App\Http\Controllers\Responsable\ExamController::class, 'show'])
+    Route::get('/Responsable/Exams/{exam}', [\App\Http\Controllers\Headdepartment\ExamController::class, 'show'])
         ->name('responsable.exams.show');
 
-    Route::get('/Responsable/Exams/{exam}/edit', [\App\Http\Controllers\Responsable\ExamController::class, 'edit'])
+    Route::get('/Responsable/Exams/{exam}/edit', [\App\Http\Controllers\Headdepartment\ExamController::class, 'edit'])
         ->name('responsable.exams.edit');
 
-    Route::put('/Responsable/Exams/{exam}', [\App\Http\Controllers\Responsable\ExamController::class, 'update'])
+    Route::put('/Responsable/Exams/{exam}', [\App\Http\Controllers\Headdepartment\ExamController::class, 'update'])
         ->name('responsable.exams.update');
 
-    Route::delete('/Responsable/Exams/{exam}', [\App\Http\Controllers\Responsable\ExamController::class, 'destroy'])
+    Route::delete('/Responsable/Exams/{exam}', [\App\Http\Controllers\Headdepartment\ExamController::class, 'destroy'])
         ->name('responsable.exams.destroy');
 
     Route::get('/Responsable/Invigilation', [InvigilationController::class, 'index'])
         ->name('responsable.invigilation');
+    
+    Route::get('/Responsable/TeacherRequests', [\App\Http\Controllers\Headdepartment\TeacherRequestController::class, 'index'])
+        ->name('responsable.teacher_requests');
     
     // Invigilation management routes
     Route::prefix('invigilation')->group(function () {
@@ -248,4 +251,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/academic/levels/{levelId}/specialities', [AcademicStructureController::class, 'getSpecialitiesByLevel']);
     Route::get('/api/academic/levels/all', [AcademicStructureController::class, 'getAllLevels']);
     Route::get('/api/academic/specialities/all', [AcademicStructureController::class, 'getAllSpecialities']);
+
+    // Report routes
+    Route::get('/Headdepartment/Report', [\App\Http\Controllers\ReportController::class, 'headdepartment'])
+        ->name('headdepartment.report');
+    
+    Route::get('/Responsable/Report', [\App\Http\Controllers\ReportController::class, 'responsable'])
+        ->name('responsable.report');
+    
+    Route::get('/Teacher/Report', [\App\Http\Controllers\ReportController::class, 'teacher'])
+        ->name('teacher.report');
+    
+    Route::get('/Student/Report', [\App\Http\Controllers\ReportController::class, 'student'])
+        ->name('student.report');
 });

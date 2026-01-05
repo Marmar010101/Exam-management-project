@@ -35,6 +35,10 @@ class DatabaseSeeder extends Seeder
             RoomSeeder::class,
             ResponsableSeeder::class,
             ExamSeeder::class,
-    ]);
+            GroupModuleSeeder::class,
+            InvigilationScheduleSeeder::class,
+            TeacherRequestSeeder::class,
+            NotificationSeeder::class,
+        ]);
     }
 }

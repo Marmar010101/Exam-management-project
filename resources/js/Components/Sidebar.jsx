@@ -11,7 +11,8 @@ import {
     BookOpen,
     Building,
     GraduationCap,
-    LogOut
+    LogOut,
+    FileBarChart
 } from 'lucide-react';
 
 export default function Sidebar({ role, isMobile = false, onClose }) {
@@ -29,6 +30,7 @@ export default function Sidebar({ role, isMobile = false, onClose }) {
             { key: 'teacher_requests', label: 'Requests', route: 'headdepartment.teacher_requests', icon: <Bell size={18} /> },
             { key: 'modules', label: 'Modules', route: 'headdepartment.modules', icon: <BookOpen size={18} /> },
             { key: 'salles', label: 'Classrooms', route: 'headdepartment.salles', icon: <Building size={18} /> },
+            { key: 'report', label: 'Report', route: 'headdepartment.report', icon: <FileBarChart size={18} /> },
         ],
       responsable: [
     {
@@ -61,6 +63,18 @@ export default function Sidebar({ role, isMobile = false, onClose }) {
         route: 'responsable.calendars',
         icon: <CalendarDays size={18} />,
     },
+    {
+        key: 'teacher_requests',
+        label: 'Teacher Requests',
+        route: 'responsable.teacher_requests',
+        icon: <Bell size={18} />,
+    },
+    {
+        key: 'report',
+        label: 'Report',
+        route: 'responsable.report',
+        icon: <FileBarChart size={18} />,
+    },
 ],
 
         
@@ -70,11 +84,13 @@ export default function Sidebar({ role, isMobile = false, onClose }) {
             { key: 'exams', label: 'Exams', route: 'teacher.exams', icon: <FileText size={18} /> },
             { key: 'modules', label: 'Modules', route: 'teacher.modules', icon: <BookOpen size={18} /> },
             { key: 'requests_alerts', label: 'Requests & Alerts', route: 'teacher.requests_alerts', icon: <Bell size={18} /> },
+            { key: 'report', label: 'Report', route: 'teacher.report', icon: <FileBarChart size={18} /> },
         ],
         student: [
               { key: 'Dashboard', label: 'Dashboard', route: 'student.dashboard', icon: <LayoutDashboard size={18} /> },
               { key: 'my_exams', label: 'My Exams', route: 'student.my_exams', icon: <FileText size={18} /> },
               { key: 'calendar', label: 'Calendar', route: 'student.calendar', icon: <Calendar size={18} /> },
+              { key: 'report', label: 'Report', route: 'student.report', icon: <FileBarChart size={18} /> },
         ],
             
     };
