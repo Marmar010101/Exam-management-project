@@ -28,9 +28,9 @@ export default function PlanningCalendar({ planning, group, auth, examPlans = []
     const [isLoading, setIsLoading] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
 
-    // Use useMemo to prevent re-creation of dependencies
-    const planningData = useMemo(() => planning || [], [planning]);
-    const examPlansData = useMemo(() => examPlans || [], [examPlans]);
+    // Use JSON.stringify to create stable dependencies
+    const planningData = useMemo(() => planning || [], [JSON.stringify(planning)]);
+    const examPlansData = useMemo(() => examPlans || [], [JSON.stringify(examPlans)]);
 
     useEffect(() => {
         // Combine existing planning with new exam plans
