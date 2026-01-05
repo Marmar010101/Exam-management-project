@@ -33,7 +33,7 @@ use App\Http\Controllers\Responsable\ExamPlanController as ResponsableExamPlanCo
 use App\Http\Controllers\Headdepartment\ExamPlanController as HeaddepartmentExamPlanController;
 use App\Http\Controllers\Teacher\RequestController as TeacherReqController;
 use App\Http\Controllers\Teacher\ExamPlanController as TeacherExamPlanController;
-use App\Http\Controllers\Student\ExamPlanController as StudentExamPlanController;
+use App\Http\Controllers\Responsable\TeacherRequestController as ResponsableTeacherRequestController;
 
 // PUBLIC ROUTES
 Route::get('/', function () {
@@ -158,8 +158,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/Responsable/Invigilation', [InvigilationController::class, 'index'])
         ->name('responsable.invigilation');
     
-    Route::get('/Responsable/TeacherRequests', [\App\Http\Controllers\Headdepartment\TeacherRequestController::class, 'index'])
+    Route::get('/Responsable/TeacherRequests', [ResponsableTeacherRequestController::class, 'index'])
         ->name('responsable.teacher_requests');
+    Route::put('/Responsable/TeacherRequests/{teacherRequest}', [ResponsableTeacherRequestController::class, 'update'])
+        ->name('responsable.teacher_requests.update');
+    Route::delete('/Responsable/TeacherRequests/{teacherRequest}', [ResponsableTeacherRequestController::class, 'destroy'])
+        ->name('responsable.teacher_requests.destroy');
     
     // Invigilation management routes
     Route::prefix('invigilation')->group(function () {

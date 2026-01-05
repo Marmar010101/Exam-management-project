@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import FullCalendar from '@fullcalendar/react';
@@ -28,13 +28,17 @@ export default function PlanningCalendar({ planning, group, auth, examPlans = []
     const [isLoading, setIsLoading] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
 
+    // Use useMemo to prevent re-creation of dependencies
+    const planningData = useMemo(() => planning || [], [planning]);
+    const examPlansData = useMemo(() => examPlans || [], [examPlans]);
+
     useEffect(() => {
         // Combine existing planning with new exam plans
         const allEvents = [];
         
         // Add existing planning events
-        if (planning && planning.length > 0) {
-            planning.forEach(exam => {
+        if (planningData && planningData.length > 0) {
+            planningData.forEach(exam => {
                 const moduleName = exam.module_name || 'Module';
                 const roomName = exam.room_name || 'No Room';
                 const examId = exam.id;
@@ -81,8 +85,8 @@ export default function PlanningCalendar({ planning, group, auth, examPlans = []
         }
 
         // Add exam plan events
-        if (examPlans && examPlans.length > 0) {
-            examPlans.forEach(plan => {
+        if (examPlansData && examPlansData.length > 0) {
+            examPlansData.forEach(plan => {
                 const moduleName = plan.module_name || 'Module';
                 const roomName = plan.room_name || 'No Room';
                 const planId = plan.id;
@@ -128,7 +132,7 @@ export default function PlanningCalendar({ planning, group, auth, examPlans = []
         }
 
         setEvents(allEvents);
-    }, [planning, examPlans]);
+    }, [planningData, examPlansData]);
 
     const handleEventClick = (clickInfo) => {
         const event = clickInfo.event;
