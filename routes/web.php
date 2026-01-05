@@ -72,12 +72,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/Student/Calendar', [StudentController::class, 'calendar'])->name('student.calendar');
 
     // Teacher routes
-    Route::get('/Teacher/alerts', [TeacherAlertController::class, 'index'])->name('teacher.alerts');
-    Route::post('/Teacher/alerts', [TeacherAlertController::class, 'store'])->name('teacher.alerts.store');
-    Route::get('/Teacher/surveillance', [TeacherSurveillanceController::class, 'index'])->name('teacher.surveillance');
-    Route::get('/Teacher/exams', [TeacherExamController::class, 'index'])->name('teacher.exams');
-    Route::get('/Teacher/modules', [TeacherModuleController::class, 'index'])->name('teacher.modules');
-    Route::get('/Teacher/requests_alerts', fn()=>Inertia::render('Teacher/requests_alerts'))->name('teacher.requests_alerts');
+    Route::get('/Teacher/Dashboard', [TeacherController::class, 'index'])
+        ->name('teacher.dashboard');
+    Route::get('/Teacher/Surveillance', [TeacherController::class, 'surveillance'])
+        ->name('teacher.surveillance');
+    Route::get('/Teacher/Exams', [TeacherController::class, 'exams'])
+        ->name('teacher.exams');
+    Route::get('/Teacher/Modules', [TeacherController::class, 'modules'])
+        ->name('teacher.modules');
+    Route::get('/Teacher/RequestsAlerts', [TeacherController::class, 'requestsAlerts'])
+        ->name('teacher.requests_alerts');
 
     // Head Department routes
     Route::get('/headdepartment/account_management/management', [UserManagementController::class, 'index'])
@@ -119,18 +123,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/Student/Calendar', [StudentController::class, 'calendar'])
         ->name('student.calendar');
 
-    // Teacher routes
-    Route::get('/Teacher/Dashboard', [TeacherController::class, 'index'])
-        ->name('teacher.dashboard');
-    Route::get('/Teacher/Surveillance', [TeacherController::class, 'surveillance'])
-        ->name('teacher.surveillance');
-    Route::get('/Teacher/Exams', [TeacherController::class, 'exams'])
-        ->name('teacher.exams');
-    Route::get('/Teacher/Modules', [TeacherController::class, 'modules'])
-        ->name('teacher.modules');
-    Route::get('/Teacher/RequestsAlerts', [TeacherController::class, 'requestsAlerts'])
-        ->name('teacher.requests_alerts');
-
+    // Teacher routes (removed duplicates - using TeacherController above)
+    
     // Responsable routes
     Route::get('/Responsable/Dashboard', function () {
         return Inertia::render('Responsable/Dashboard');
