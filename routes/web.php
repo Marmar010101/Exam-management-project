@@ -29,6 +29,10 @@ use Inertia\Inertia;
 use Illuminate\Foundation\Application;
 
 use App\Http\Controllers\Headdepartment\AccountManagementController;
+use App\Http\Controllers\Responsable\ExamPlanController as ResponsableExamPlanController;
+use App\Http\Controllers\Headdepartment\ExamPlanController as HeaddepartmentExamPlanController;
+use App\Http\Controllers\Teacher\ExamPlanController as TeacherExamPlanController;
+use App\Http\Controllers\Student\ExamPlanController as StudentExamPlanController;
 
 // PUBLIC ROUTES
 Route::get('/', function () {
@@ -258,6 +262,37 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/Responsable/Report', [\App\Http\Controllers\ReportController::class, 'responsable'])
         ->name('responsable.report');
+    
+    // Exam Plan routes - Responsable (Create, Manage)
+    Route::prefix('responsable/exam-plans')->group(function () {
+        Route::get('/', [ResponsableExamPlanController::class, 'index'])->name('responsable.exam-plans.index');
+        Route::get('/create', [ResponsableExamPlanController::class, 'create'])->name('responsable.exam-plans.create');
+        Route::post('/', [ResponsableExamPlanController::class, 'store'])->name('responsable.exam-plans.store');
+        Route::get('/{examPlan}', [ResponsableExamPlanController::class, 'show'])->name('responsable.exam-plans.show');
+        Route::get('/{examPlan}/edit', [ResponsableExamPlanController::class, 'edit'])->name('responsable.exam-plans.edit');
+        Route::put('/{examPlan}', [ResponsableExamPlanController::class, 'update'])->name('responsable.exam-plans.update');
+        Route::delete('/{examPlan}', [ResponsableExamPlanController::class, 'destroy'])->name('responsable.exam-plans.destroy');
+    });
+    
+    // Exam Plan routes - Headdepartment (Validate)
+    Route::prefix('headdepartment/exam-plans')->group(function () {
+        Route::get('/', [HeaddepartmentExamPlanController::class, 'index'])->name('headdepartment.exam-plans.index');
+        Route::get('/{examPlan}', [HeaddepartmentExamPlanController::class, 'show'])->name('headdepartment.exam-plans.show');
+        Route::post('/{examPlan}/validate', [HeaddepartmentExamPlanController::class, 'validate'])->name('headdepartment.exam-plans.validate');
+        Route::get('/all', [HeaddepartmentExamPlanController::class, 'all'])->name('headdepartment.exam-plans.all');
+    });
+    
+    // Exam Plan routes - Teacher (Consult)
+    Route::prefix('teacher/exam-plans')->group(function () {
+        Route::get('/', [TeacherExamPlanController::class, 'index'])->name('teacher.exam-plans.index');
+        Route::get('/{examPlan}', [TeacherExamPlanController::class, 'show'])->name('teacher.exam-plans.show');
+    });
+    
+    // Exam Plan routes - Student (Consult)
+    Route::prefix('student/exam-plans')->group(function () {
+        Route::get('/', [StudentExamPlanController::class, 'index'])->name('student.exam-plans.index');
+        Route::get('/{examPlan}', [StudentExamPlanController::class, 'show'])->name('student.exam-plans.show');
+    });
     
     Route::get('/Teacher/Report', [\App\Http\Controllers\ReportController::class, 'teacher'])
         ->name('teacher.report');

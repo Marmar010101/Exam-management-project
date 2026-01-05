@@ -1,4 +1,3 @@
-// resources/js/Pages/Responsable/PlanningCalendar.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -15,18 +14,26 @@ import {
     Building,
     RefreshCw,
     MapPin,
-    Send 
+    Send,
+    PlusCircle,
+    AlertCircle,
+    CheckCircle,
+    XCircle,
+    PlayCircle
 } from 'lucide-react';
 
-export default function PlanningCalendar({ planning, group, auth }) {
+export default function PlanningCalendar({ planning, group, auth, examPlans = [] }) {
     const [events, setEvents] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     useEffect(() => {
+        // Combine existing planning with new exam plans
+        const allEvents = [];
+        
+        // Add existing planning events
         if (planning && planning.length > 0) {
-            console.log('Planning data sample:', planning[0]); // Debug
-            
-            const calendarEvents = planning.map(exam => {
+            planning.forEach(exam => {
                 const moduleName = exam.module_name || 'Module';
                 const roomName = exam.room_name || 'No Room';
                 const examId = exam.id;
@@ -49,299 +56,281 @@ export default function PlanningCalendar({ planning, group, auth }) {
                     case 'Practical test':
                         backgroundColor = '#8B5CF6';
                         break;
+                    default:
+                        backgroundColor = '#6B7280';
                 }
 
-                return {
-                    id: examId,
-                    title: moduleName,
-                    start: exam.exam_date,
-                    end: exam.exam_date,
-                    allDay: false,
-                    backgroundColor: backgroundColor,
+                allEvents.push({
+                    id: `existing-${examId}`,
+                    title: `${moduleName} - ${roomName}`,
+                    start: exam.exam_date + 'T' + (exam.start_time || '09:00'),
+                    end: exam.exam_date + 'T' + (exam.end_time || '11:00'),
+                    backgroundColor,
                     borderColor: backgroundColor,
                     textColor: '#FFFFFF',
                     extendedProps: {
-                        room: roomName,
-                        examId: examId,
+                        type: 'existing',
+                        examId,
+                        moduleName,
+                        roomName,
+                        examType: exam.exam_type,
+                        teacher: exam.teacher_name || 'Not assigned'
                     }
-                };
+                });
             });
-
-            setEvents(calendarEvents);
-        } else {
-            setEvents([]);
         }
-    }, [planning]);
 
-    const handleRefresh = () => {
-        setIsLoading(true);
-        window.location.reload();
-    };
+        // Add exam plan events
+        if (examPlans && examPlans.length > 0) {
+            examPlans.forEach(plan => {
+                const moduleName = plan.module_name || 'Module';
+                const roomName = plan.room_name || 'No Room';
+                const planId = plan.id;
 
-    const handlePrint = () => {
-        window.print();
-    };
+                // Determine color based on status
+                let backgroundColor = '#F59E0B'; // Default for pending
+                switch (plan.status) {
+                    case 'pending':
+                        backgroundColor = '#F59E0B';
+                        break;
+                    case 'validated':
+                        backgroundColor = '#10B981';
+                        break;
+                    case 'rejected':
+                        backgroundColor = '#EF4444';
+                        break;
+                    case 'scheduled':
+                        backgroundColor = '#3B82F6';
+                        break;
+                    default:
+                        backgroundColor = '#6B7280';
+                }
 
-    const handleExport = () => {
-        if (group && group.id) {
-            const url = route('calendars.export.group.pdf', { group: group.id });
-            window.open(url, '_blank');
+                allEvents.push({
+                    id: `plan-${planId}`,
+                    title: `${moduleName} - ${roomName} [PLAN]`,
+                    start: plan.exam_date + 'T' + (plan.start_time || '09:00'),
+                    end: plan.exam_date + 'T' + (plan.end_time || '11:00'),
+                    backgroundColor,
+                    borderColor: backgroundColor,
+                    textColor: '#FFFFFF',
+                    extendedProps: {
+                        type: 'exam_plan',
+                        planId,
+                        moduleName,
+                        roomName,
+                        examType: plan.exam_type,
+                        status: plan.status,
+                        teacher: plan.teacher_name || 'Not assigned'
+                    }
+                });
+            });
         }
-    };
 
-    // Get date range for display
-    const getDateRange = () => {
-        if (!planning || planning.length === 0) return '';
-        
-        const dates = planning.map(e => new Date(e.exam_date));
-        const minDate = new Date(Math.min(...dates));
-        const maxDate = new Date(Math.max(...dates));
-        
-        return `${minDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} - ${maxDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-    };
+        setEvents(allEvents);
+    }, [planning, examPlans]);
 
-    // Custom event content renderer - SIMPLIFIED: ONLY MODULE AND ROOM
-    const renderEventContent = (eventInfo) => {
-        const event = eventInfo.event;
-        const extendedProps = event.extendedProps;
-        
-        return (
-            <div className="h-full p-1">
-                <Link 
-                    href={route('exams.show', extendedProps.examId)}
-                    className="block h-full hover:opacity-90 transition-opacity"
-                >
-                    <div className="flex flex-col h-full justify-between">
-                        {/* ONLY Module Name (Bold, Top) */}
-                        <div className="font-bold text-xs mb-1 truncate leading-tight">
-                            {event.title}
-                        </div>
-                        
-                        {/* ONLY Room Name (Below with icon) - NO TIME, NO DATE, NO TYPE */}
-                        <div className="text-[10px] opacity-90 truncate flex items-center gap-0.5">
-                            <MapPin className="h-2.5 w-2.5 flex-shrink-0" />
-                            <span>{extendedProps.room}</span>
-                        </div>
-                        
-                        {/* REMOVED: Time and Type display completely */}
-                    </div>
-                </Link>
-            </div>
-        );
-    };
-
-    // Event click handler
     const handleEventClick = (clickInfo) => {
-        clickInfo.jsEvent.preventDefault();
-        if (clickInfo.event.extendedProps.examId) {
-            window.location.href = route('exams.show', clickInfo.event.extendedProps.examId);
+        const event = clickInfo.event;
+        const extendedProps = event.extendedProps;
+
+        if (extendedProps.type === 'exam_plan') {
+            // Navigate to exam plan details
+            window.location.href = `/responsable/exam-plans/${extendedProps.planId}`;
+        } else {
+            // Handle existing exam click
+            console.log('Existing exam clicked:', extendedProps);
+        }
+    };
+
+    const handleDateSelect = (selectInfo) => {
+        // Open create modal when selecting a date
+        setShowCreateModal(true);
+    };
+
+    const getStatusIcon = (status) => {
+        switch (status) {
+            case 'pending': return <AlertCircle className="h-4 w-4 text-yellow-600" />;
+            case 'validated': return <CheckCircle className="h-4 w-4 text-green-600" />;
+            case 'rejected': return <XCircle className="h-4 w-4 text-red-600" />;
+            case 'scheduled': return <PlayCircle className="h-4 w-4 text-blue-600" />;
+            default: return <AlertCircle className="h-4 w-4 text-gray-600" />;
         }
     };
 
     return (
-        <AuthenticatedLayout 
-            user={auth.user}
-            title="Exam Calendar" 
-            activeRoute="dashboard"
-        >
+        <AuthenticatedLayout header="Planning Calendar - Responsible">
             <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-8">
-                    <div className="flex items-center justify-between">
+                    <div className="flex justify-between items-center">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">
-                                Exam Calendar{group && group.name ? `: ${group.name}` : ''}
-                            </h1>
-                            <p className="text-gray-600 mt-1">
-                                {planning && planning.length ? `${planning.length} exams scheduled • ${getDateRange()}` : 'No exams scheduled'}
-                            </p>
+                            <h1 className="text-3xl font-bold text-gray-900">Planning Calendar</h1>
+                            <p className="text-gray-600 mt-1">Manage exam schedules and create new exam plans</p>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex space-x-3">
                             <button
-                                onClick={handleRefresh}
-                                disabled={isLoading}
-                                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
+                                onClick={() => setShowCreateModal(true)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium inline-flex items-center transition-colors"
                             >
-                                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                                Refresh
-                            </button>
-                            <button
-                                onClick={handleExport}
-                                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
-                            >
-                                <Download className="h-4 w-4" />
-                                Export
-                            </button>
-                            <button
-                                onClick={handlePrint}
-                                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
-                            >
-                                <Printer className="h-4 w-4" />
-                                Print
+                                <PlusCircle className="h-5 w-5 mr-2" />
+                                Create Exam Plan
                             </button>
                             <Link
-                                href={group && group.id ? route('session.planning.create', { group: group.id }) : '#'}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                                href={route('responsable.exam-plans.index')}
+                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium inline-flex items-center transition-colors"
                             >
-                                <CalendarDays className="h-4 w-4" />
-                                Plan New Session
+                                <CalendarDays className="h-5 w-5 mr-2" />
+                                View All Plans
                             </Link>
                         </div>
                     </div>
                 </div>
 
-                {/* Calendar - Full Width */}
-                <div className="bg-white rounded-xl shadow border border-gray-200 p-4">
-                    {!planning || planning.length === 0 ? (
-                        <div className="text-center py-12">
-                            <CalendarDays className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">
-                                No exams scheduled yet
-                            </h3>
-                            <p className="text-gray-600 mb-4">
-                                Create a session planning to schedule exams for this group.
-                            </p>
-                            <Link
-                                href={group && group.id ? route('session.planning.create', { group: group.id }) : '#'}
-                                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                            >
-                                <CalendarDays className="h-4 w-4 mr-2" />
-                                Plan New Session
-                            </Link>
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0 bg-blue-100 rounded-lg p-3">
+                                <CalendarDays className="h-8 w-8 text-blue-600" />
+                            </div>
+                            <div className="ml-4">
+                                <p className="text-sm font-medium text-gray-600">Total Plans</p>
+                                <p className="text-2xl font-bold text-gray-900">{examPlans.length}</p>
+                            </div>
                         </div>
-                    ) : (
-                        <FullCalendar
-                            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                            initialView="dayGridMonth"
-                            headerToolbar={{
-                                left: 'prev,next today',
-                                center: 'title',
-                                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                            }}
-                            events={events}
-                            height="700px"
-                            eventDisplay="block"
-                            // Customize month view display
-                            dayMaxEvents={4}
-                            dayMaxEventRows={4}
-                            moreLinkClick="popover"
-                            moreLinkContent={args => {
-                                return `+${args.num} more`;
-                            }}
-                            // Custom event rendering
-                            eventContent={renderEventContent}
-                            // Event click handler
-                            eventClick={handleEventClick}
-                            // Remove time display completely
-                            eventTimeFormat={false}
-                        />
-                    )}
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0 bg-yellow-100 rounded-lg p-3">
+                                <AlertCircle className="h-8 w-8 text-yellow-600" />
+                            </div>
+                            <div className="ml-4">
+                                <p className="text-sm font-medium text-gray-600">Pending</p>
+                                <p className="text-2xl font-bold text-gray-900">
+                                    {examPlans.filter(p => p.status === 'pending').length}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0 bg-green-100 rounded-lg p-3">
+                                <CheckCircle className="h-8 w-8 text-green-600" />
+                            </div>
+                            <div className="ml-4">
+                                <p className="text-sm font-medium text-gray-600">Validated</p>
+                                <p className="text-2xl font-bold text-gray-900">
+                                    {examPlans.filter(p => p.status === 'validated').length}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0 bg-purple-100 rounded-lg p-3">
+                                <Clock className="h-8 w-8 text-purple-600" />
+                            </div>
+                            <div className="ml-4">
+                                <p className="text-sm font-medium text-gray-600">Scheduled</p>
+                                <p className="text-2xl font-bold text-gray-900">
+                                    {examPlans.filter(p => p.status === 'scheduled').length}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Legend */}
-                {planning && planning.length > 0 && (
-                    <div className="mt-6 bg-white rounded-lg border border-gray-200 p-4">
-                        <h3 className="font-medium text-gray-900 mb-3">Exam Type Legend</h3>
-                        <div className="flex flex-wrap gap-3">
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded bg-blue-500"></div>
-                                <span className="text-sm text-gray-600">Final Exam</span>
+                {/* Calendar */}
+                <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+                    <div className="mb-4 flex justify-between items-center">
+                        <h2 className="text-xl font-bold text-gray-900">Exam Calendar</h2>
+                        <div className="flex space-x-2">
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100"
+                            >
+                                <RefreshCw className="h-5 w-5" />
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <FullCalendar
+                        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                        initialView="dayGridMonth"
+                        headerToolbar={{
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                        }}
+                        events={events}
+                        eventClick={handleEventClick}
+                        selectable={true}
+                        select={handleDateSelect}
+                        height="auto"
+                        aspectRatio={1.8}
+                        eventDisplay="block"
+                        displayEventTime={true}
+                        eventBackgroundColor="#3B82F6"
+                        eventBorderColor="#3B82F6"
+                        eventTextColor="#FFFFFF"
+                    />
+                </div>
+
+                {/* Create Exam Plan Modal */}
+                {showCreateModal && (
+                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-xl font-bold text-gray-900">Create Exam Plan</h3>
+                                <button
+                                    onClick={() => setShowCreateModal(false)}
+                                    className="text-gray-400 hover:text-gray-600"
+                                >
+                                    <X className="h-6 w-6" />
+                                </button>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded bg-green-500"></div>
-                                <span className="text-sm text-gray-600">Continuous Assessment</span>
+
+                            <div className="space-y-4">
+                                <p className="text-gray-600">
+                                    Choose how you want to create your exam plan:
+                                </p>
+                                
+                                <div className="space-y-3">
+                                    <Link
+                                        href={route('responsable.exam-plans.create')}
+                                        className="block w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium text-center transition-colors"
+                                    >
+                                        Create Detailed Exam Plan
+                                    </Link>
+                                    
+                                    <button
+                                        onClick={() => {
+                                            alert('Quick creation feature coming soon! Use the detailed form for now.');
+                                            setShowCreateModal(false);
+                                        }}
+                                        className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-3 rounded-lg font-medium transition-colors"
+                                    >
+                                        Quick Create (Coming Soon)
+                                    </button>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded bg-amber-500"></div>
-                                <span className="text-sm text-gray-600">Make-up Exam</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded bg-red-500"></div>
-                                <span className="text-sm text-gray-600">Replacement Exam</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded bg-purple-500"></div>
-                                <span className="text-sm text-gray-600">Practical Test</span>
+
+                            <div className="flex justify-end mt-6">
+                                <button
+                                    onClick={() => setShowCreateModal(false)}
+                                    className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium"
+                                >
+                                    Cancel
+                                </button>
                             </div>
                         </div>
                     </div>
                 )}
             </div>
-
-            {/* Custom CSS for FullCalendar */}
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                /* Make events fill the entire day cell */
-                .fc-daygrid-event {
-                    margin: 1px 0 !important;
-                    height: auto !important;
-                    min-height: 38px !important;
-                    border-radius: 4px !important;
-                    border: none !important;
-                }
-                
-                .fc-daygrid-block-event {
-                    position: relative !important;
-                    padding: 2px !important;
-                }
-                
-                .fc-event-main {
-                    padding: 0 !important;
-                    height: 100% !important;
-                }
-                
-                .fc-event-title-container {
-                    height: 100% !important;
-                }
-                
-                /* Remove all date/time from event */
-                .fc-event-time {
-                    display: none !important;
-                }
-                
-                /* Date number styling */
-                .fc-daygrid-day-number {
-                    font-weight: 600 !important;
-                    color: #374151 !important;
-                    padding: 4px !important;
-                    font-size: 14px !important;
-                }
-                
-                /* Today's date */
-                .fc-day-today {
-                    background-color: #eff6ff !important;
-                }
-                
-                .fc-day-today .fc-daygrid-day-number {
-                    background-color: #3b82f6 !important;
-                    color: white !important;
-                    border-radius: 9999px !important;
-                    width: 24px !important;
-                    height: 24px !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                }
-                
-                /* Hover effect for events */
-                .fc-daygrid-event:hover {
-                    opacity: 0.9 !important;
-                    transform: translateY(-1px) !important;
-                    transition: all 0.2s ease !important;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-                }
-                
-                /* Make more link smaller */
-                .fc-daygrid-more-link {
-                    font-size: 11px !important;
-                    color: #6b7280 !important;
-                    padding: 2px 4px !important;
-                    background-color: #f3f4f6 !important;
-                    border-radius: 4px !important;
-                    margin-top: 2px !important;
-                }
-                `
-            }} />
         </AuthenticatedLayout>
     );
 }

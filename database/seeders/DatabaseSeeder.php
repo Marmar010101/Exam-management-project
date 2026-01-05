@@ -36,9 +36,9 @@ class DatabaseSeeder extends Seeder
             ResponsableSeeder::class,
             ExamSeeder::class,
             GroupModuleSeeder::class,
-            InvigilationScheduleSeeder::class,
-            TeacherRequestSeeder::class,
-            NotificationSeeder::class,
         ]);
+        $this->call(InvigilationScheduleSeeder::class);
+        $this->call(TeacherRequestSeeder::class);
+        $this->call(ExamPlanSeeder::class);
     }
 }
