@@ -19,7 +19,8 @@ import {
     AlertCircle,
     CheckCircle,
     XCircle,
-    PlayCircle
+    PlayCircle,
+    X
 } from 'lucide-react';
 
 export default function PlanningCalendar({ planning, group, auth, examPlans = [] }) {
@@ -61,20 +62,19 @@ export default function PlanningCalendar({ planning, group, auth, examPlans = []
                 }
 
                 allEvents.push({
-                    id: `existing-${examId}`,
+                    id: `exam-${examId}`,
                     title: `${moduleName} - ${roomName}`,
-                    start: exam.exam_date + 'T' + (exam.start_time || '09:00'),
-                    end: exam.exam_date + 'T' + (exam.end_time || '11:00'),
-                    backgroundColor,
+                    start: exam.date,
+                    backgroundColor: backgroundColor,
                     borderColor: backgroundColor,
-                    textColor: '#FFFFFF',
                     extendedProps: {
-                        type: 'existing',
-                        examId,
-                        moduleName,
-                        roomName,
+                        type: 'exam',
+                        examId: examId,
                         examType: exam.exam_type,
-                        teacher: exam.teacher_name || 'Not assigned'
+                        module: moduleName,
+                        room: roomName,
+                        teacher: exam.teacher_name || 'No Teacher',
+                        group: exam.group_name || 'No Group'
                     }
                 });
             });
@@ -88,7 +88,7 @@ export default function PlanningCalendar({ planning, group, auth, examPlans = []
                 const planId = plan.id;
 
                 // Determine color based on status
-                let backgroundColor = '#F59E0B'; // Default for pending
+                let backgroundColor = '#6B7280';
                 switch (plan.status) {
                     case 'pending':
                         backgroundColor = '#F59E0B';
@@ -108,20 +108,20 @@ export default function PlanningCalendar({ planning, group, auth, examPlans = []
 
                 allEvents.push({
                     id: `plan-${planId}`,
-                    title: `${moduleName} - ${roomName} [PLAN]`,
-                    start: plan.exam_date + 'T' + (plan.start_time || '09:00'),
-                    end: plan.exam_date + 'T' + (plan.end_time || '11:00'),
-                    backgroundColor,
+                    title: `${moduleName} (${plan.status})`,
+                    start: `${plan.exam_date}T${plan.start_time}`,
+                    end: `${plan.exam_date}T${plan.end_time}`,
+                    backgroundColor: backgroundColor,
                     borderColor: backgroundColor,
-                    textColor: '#FFFFFF',
                     extendedProps: {
                         type: 'exam_plan',
-                        planId,
-                        moduleName,
-                        roomName,
-                        examType: plan.exam_type,
+                        planId: planId,
                         status: plan.status,
-                        teacher: plan.teacher_name || 'Not assigned'
+                        examType: plan.exam_type,
+                        module: moduleName,
+                        room: roomName,
+                        teacher: plan.teacher_name || 'No Teacher',
+                        group: plan.group_name || 'No Group'
                     }
                 });
             });

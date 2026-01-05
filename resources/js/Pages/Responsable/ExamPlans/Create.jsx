@@ -4,15 +4,13 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
     Calendar,
     Clock,
-    Users,
     Save,
     X,
     ChevronLeft,
-    AlertCircle,
-    CheckCircle
+    AlertCircle
 } from 'lucide-react';
 
-export default function ExamPlansCreate({ groups, modules, teachers, rooms, examTypes }) {
+export default function ExamPlansCreate({ groups = [], modules = [], teachers = [], rooms = [], examTypes = [] }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         group_id: '',
         module_id: '',
@@ -35,37 +33,6 @@ export default function ExamPlansCreate({ groups, modules, teachers, rooms, exam
         });
     };
 
-    const handleGroupChange = (e) => {
-        const groupId = e.target.value;
-        setData('group_id', groupId);
-        // You could filter modules by group if needed
-    };
-
-    const handleModuleChange = (e) => {
-        const moduleId = e.target.value;
-        setData('module_id', moduleId);
-        
-        // Auto-select teacher if module has a default teacher
-        const module = modules.find(m => m.id == moduleId);
-        if (module?.teacher_id) {
-            setData('teacher_id', module.teacher_id);
-        }
-    };
-
-    const handleTimeChange = (field, value) => {
-        setData(field, value);
-        
-        // Auto-calculate duration if both times are set
-        if (data.start_time && data.end_time) {
-            const start = new Date(`2000-01-01T${data.start_time}`);
-            const end = new Date(`2000-01-01T${data.end_time}`);
-            const duration = Math.round((end - start) / (1000 * 60));
-            if (duration > 0) {
-                setData('duration_minutes', duration);
-            }
-        }
-    };
-
     return (
         <AuthenticatedLayout header="Create Exam Plan - Responsible">
             <Head title="Create Exam Plan - Responsible" />
@@ -76,15 +43,15 @@ export default function ExamPlansCreate({ groups, modules, teachers, rooms, exam
                     <div className="flex items-center mb-4">
                         <Link
                             href={route('responsable.exam-plans.index')}
-                            className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center mr-4"
+                            className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center"
                         >
-                            <ChevronLeft className="h-4 w-4 mr-1" />
+                            <ChevronLeft className="h-4 w-4 mr-2" />
                             Back to Exam Plans
                         </Link>
                     </div>
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">Create New Exam Plan</h1>
-                        <p className="text-gray-600 mt-1">Fill in the details to create a new exam plan for validation</p>
+                        <p className="text-gray-600 mt-1">Fill in details to create a new exam plan for validation</p>
                     </div>
                 </div>
 
@@ -99,14 +66,14 @@ export default function ExamPlansCreate({ groups, modules, teachers, rooms, exam
                                 </label>
                                 <select
                                     value={data.group_id}
-                                    onChange={handleGroupChange}
+                                    onChange={(e) => setData('group_id', e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     required
                                 >
                                     <option value="">Select Group</option>
                                     {groups.map((group) => (
                                         <option key={group.id} value={group.id}>
-                                            {group.name} - {group.level?.name} - {group.speciality?.name}
+                                            {group.name} - {group.level?.name || 'General'} - {group.speciality?.name || 'No Speciality'}
                                         </option>
                                     ))}
                                 </select>
@@ -124,7 +91,7 @@ export default function ExamPlansCreate({ groups, modules, teachers, rooms, exam
                                 </label>
                                 <select
                                     value={data.module_id}
-                                    onChange={handleModuleChange}
+                                    onChange={(e) => setData('module_id', e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     required
                                 >
@@ -249,7 +216,7 @@ export default function ExamPlansCreate({ groups, modules, teachers, rooms, exam
                                 <input
                                     type="time"
                                     value={data.start_time}
-                                    onChange={(e) => handleTimeChange('start_time', e.target.value)}
+                                    onChange={(e) => setData('start_time', e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     required
                                 />
@@ -268,7 +235,7 @@ export default function ExamPlansCreate({ groups, modules, teachers, rooms, exam
                                 <input
                                     type="time"
                                     value={data.end_time}
-                                    onChange={(e) => handleTimeChange('end_time', e.target.value)}
+                                    onChange={(e) => setData('end_time', e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     required
                                 />
@@ -316,24 +283,24 @@ export default function ExamPlansCreate({ groups, modules, teachers, rooms, exam
                             />
                             {errors.description && (
                                 <p className="mt-1 text-sm text-red-600 flex items-center">
-                                    <AlertCircle className="h-4 w-4 mr-1" />
-                                    {errors.description}
-                                </p>
-                            )}
+                                        <AlertCircle className="h-4 w-4 mr-1" />
+                                        {errors.description}
+                                    </p>
+                                )}
                         </div>
 
                         {/* Form Actions */}
                         <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
                             <Link
                                 href={route('responsable.exam-plans.index')}
-                                className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium transition-colors"
+                                className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium"
                             >
                                 Cancel
                             </Link>
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium inline-flex items-center disabled:opacity-50 transition-colors"
+                                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium disabled:opacity-50"
                             >
                                 {processing ? (
                                     <>

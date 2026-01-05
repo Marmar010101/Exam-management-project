@@ -31,6 +31,7 @@ use Illuminate\Foundation\Application;
 use App\Http\Controllers\Headdepartment\AccountManagementController;
 use App\Http\Controllers\Responsable\ExamPlanController as ResponsableExamPlanController;
 use App\Http\Controllers\Headdepartment\ExamPlanController as HeaddepartmentExamPlanController;
+use App\Http\Controllers\Teacher\RequestController as TeacherReqController;
 use App\Http\Controllers\Teacher\ExamPlanController as TeacherExamPlanController;
 use App\Http\Controllers\Student\ExamPlanController as StudentExamPlanController;
 
@@ -292,6 +293,14 @@ Route::middleware('auth')->group(function () {
     Route::prefix('student/exam-plans')->group(function () {
         Route::get('/', [StudentExamPlanController::class, 'index'])->name('student.exam-plans.index');
         Route::get('/{examPlan}', [StudentExamPlanController::class, 'show'])->name('student.exam-plans.show');
+    });
+    
+    // Teacher Request routes
+    Route::prefix('teacher/requests')->group(function () {
+        Route::get('/', [TeacherReqController::class, 'index'])->name('teacher.requests.index');
+        Route::get('/create', [TeacherReqController::class, 'create'])->name('teacher.requests.create');
+        Route::post('/', [TeacherReqController::class, 'store'])->name('teacher.requests.store');
+        Route::get('/{request}', [TeacherReqController::class, 'show'])->name('teacher.requests.show');
     });
     
     Route::get('/Teacher/Report', [\App\Http\Controllers\ReportController::class, 'teacher'])

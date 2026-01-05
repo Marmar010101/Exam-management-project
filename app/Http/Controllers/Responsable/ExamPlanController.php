@@ -69,7 +69,7 @@ class ExamPlanController extends Controller
         $groups = Group::with(['level', 'speciality'])->orderBy('name')->get();
         $modules = Module::with(['teacher'])->orderBy('module_name')->get();
         $teachers = Teacher::with(['user'])->orderBy('first_name')->get();
-        $rooms = Room::where('availability', true)->orderBy('name')->get();
+        $rooms = Room::where('availability', true)->orderBy('room_name')->get();
         $examTypes = ['Final', 'Midterm', 'Quiz', 'Practical', 'Oral'];
 
         return Inertia::render('Responsable/ExamPlans/Create', [
@@ -160,7 +160,7 @@ class ExamPlanController extends Controller
         $groups = Group::with(['level', 'speciality'])->orderBy('name')->get();
         $modules = Module::with(['teacher'])->orderBy('module_name')->get();
         $teachers = Teacher::with(['user'])->orderBy('first_name')->get();
-        $rooms = Room::where('availability', true)->orderBy('name')->get();
+        $rooms = Room::where('availability', true)->orderBy('room_name')->get();
         $examTypes = ['Final', 'Midterm', 'Quiz', 'Practical', 'Oral'];
 
         return Inertia::render('Responsable/ExamPlans/Edit', [
