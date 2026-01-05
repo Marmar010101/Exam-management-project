@@ -76,6 +76,27 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Universal dashboard route - redirects based on user role
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+        
+        switch ($user->role) {
+            case 'headdepartment':
+                return redirect()->route('headdepartment.dashboard');
+            case 'responsable':
+                return redirect()->route('responsable.dashboard');
+            case 'teacher':
+                return redirect()->route('teacher.dashboard');
+            case 'student':
+                return redirect()->route('student.dashboard');
+            default:
+                return redirect()->route('login');
+        }
+    })->name('dashboard');
+
     // Dashboard routes by role
     Route::get('/headdepartment/Dashboard', [HeadDepartmentController::class, 'index'])
         ->name('headdepartment.dashboard');
