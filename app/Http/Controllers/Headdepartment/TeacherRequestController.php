@@ -28,8 +28,10 @@ class TeacherRequestController extends Controller
                     'type' => $request->type,
                     'title' => $request->title,
                     'description' => $request->description,
-                    'start_date' => $request->start_date,
-                    'end_date' => $request->end_date,
+                    'date' => $request->date,
+                    'time' => $request->time,
+                    'room' => $request->room,
+                    'urgency' => $request->urgency,
                     'status' => $request->status,
                     'created_at' => $request->created_at->format('Y-m-d H:i:s'),
                 ];
