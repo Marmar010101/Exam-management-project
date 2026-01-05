@@ -33,7 +33,6 @@ use App\Http\Controllers\Responsable\ExamPlanController as ResponsableExamPlanCo
 use App\Http\Controllers\Headdepartment\ExamPlanController as HeaddepartmentExamPlanController;
 use App\Http\Controllers\Teacher\RequestController as TeacherReqController;
 use App\Http\Controllers\Teacher\ExamPlanController as TeacherExamPlanController;
-use App\Http\Controllers\Student\ExamPlanController as StudentExamPlanController;
 use App\Http\Controllers\Responsable\TeacherRequestController as ResponsableTeacherRequestController;
 
 // PUBLIC ROUTES
@@ -46,28 +45,10 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware('guest')->group(function () {
-    Route::get('login', [AuthenticatedSessionController::class, 'create'])
-                ->name('login');
-});
-
-Route::post('login', [AuthenticatedSessionController::class, 'store'])
-    ->name('login.store');
-
-Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
-    ->name('logout');
-
-Route::get('/forgot-password', [AuthenticatedSessionController::class, 'request'])
-    ->name('password.request');
-
-Route::post('forgot-password', [AuthenticatedSessionController::class, 'email'])
-    ->name('password.email');
-
-Route::put('reset-password/{token}', [AuthenticatedSessionController::class, 'update'])
-    ->name('password.update');
-
-Route::get('/reset-password/{token}', [AuthenticatedSessionController::class, 'edit'])
-    ->name('password.edit');
+// AUTH ROUTES
+Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 // PROTECTED ROUTES
 Route::middleware('auth')->group(function () {
@@ -143,16 +124,24 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Responsable/GroupsIndex');
     })->name('responsable.groups');
 
-    Route::get('/Responsable/Exams/Index', [\App\Http\Controllers\Headdepartment\ExamController::class, 'index'])
+    Route::get('Responsable/Exams/Index', [\App\Http\Controllers\Headdepartment\ExamController::class, 'index'])
         ->name('responsable.exams');
+
     Route::get('/Responsable/Exams/Create', [\App\Http\Controllers\Headdepartment\ExamController::class, 'create'])
         ->name('responsable.exams.create');
+
     Route::post('/Responsable/Exams', [\App\Http\Controllers\Headdepartment\ExamController::class, 'store'])
         ->name('responsable.exams.store');
+
     Route::get('/Responsable/Exams/{exam}', [\App\Http\Controllers\Headdepartment\ExamController::class, 'show'])
         ->name('responsable.exams.show');
+
+    Route::get('/Responsable/Exams/{exam}/edit', [\App\Http\Controllers\Headdepartment\ExamController::class, 'edit'])
+        ->name('responsable.exams.edit');
+
     Route::put('/Responsable/Exams/{exam}', [\App\Http\Controllers\Headdepartment\ExamController::class, 'update'])
         ->name('responsable.exams.update');
+
     Route::delete('/Responsable/Exams/{exam}', [\App\Http\Controllers\Headdepartment\ExamController::class, 'destroy'])
         ->name('responsable.exams.destroy');
 
@@ -166,6 +155,39 @@ Route::middleware('auth')->group(function () {
     Route::delete('/Responsable/TeacherRequests/{teacherRequest}', [ResponsableTeacherRequestController::class, 'destroy'])
         ->name('responsable.teacher_requests.destroy');
     
+    // Invigilation management routes
+    Route::prefix('invigilation')->group(function () {
+        Route::get('/', [InvigilationController::class, 'index'])->name('invigilation.index');
+        Route::post('/auto-assign', [InvigilationController::class, 'autoAssign'])->name('invigilation.auto-assign');
+        Route::post('/manual-assign', [InvigilationController::class, 'manualAssign'])->name('invigilation.manual-assign');
+        Route::delete('/{id}', [InvigilationController::class, 'destroy'])->name('invigilation.destroy');
+        Route::post('/notify', [InvigilationController::class, 'notifyTeacher'])->name('invigilation.notify');
+        Route::post('/send-emails', [InvigilationController::class, 'sendEmails'])->name('invigilation.send-emails');
+        Route::get('/download/{type}', [InvigilationController::class, 'downloadSchedule'])->name('invigilation.download');
+        Route::get('/exam/{exam}/print', [InvigilationController::class, 'printExamSchedule'])->name('invigilation.print-exam');
+    });
+    
+    Route::get('/Responsable/Calendars', [CalendarController::class, 'index'])
+        ->name('responsable.calendars');
+    
+    // Calendar management routes
+    Route::get('/calendars', [CalendarController::class, 'index'])->name('calendars.index');
+    Route::get('/calendars/export-pdf', [CalendarController::class, 'exportPdf'])->name('calendars.export.pdf');
+    Route::get('/calendars/export-group-pdf/{group}', [CalendarController::class, 'exportGroupCalendarPdf'])->name('calendars.export.group.pdf');
+    
+    Route::get('/Responsable/Notifications', [NotificationController::class, 'index'])
+        ->name('responsable.notifications');
+    
+    // Notification management routes
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+    Route::get('/api/notifications/count', [NotificationController::class, 'getUnreadCount'])->name('notifications.count');
+    Route::get('/api/notifications/recent', [NotificationController::class, 'getRecent'])->name('notifications.recent');
+    
+    Route::get('/Responsable/GroupsIndex', [ResponsableDashboardController::class, 'allGroups'])
+        ->name('responsable.groups.index');
+    
     Route::get('/Responsable/PlanningCalendar', function () {
         return Inertia::render('Responsable/PlanningCalendar');
     })->name('responsable.planning.calendar');
@@ -174,10 +196,57 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Responsable/SessionPlanning');
     })->name('responsable.session.planning');
     
-    Route::get('/Responsable/TeacherRequests', [\App\Http\Controllers\Responsable\TeacherRequestController::class, 'index'])
-        ->name('responsable.teacher_requests');
+    // Session planning routes (commented for now - controller missing)
+    /*
+    Route::get('/responsable/session-planning/{group}', [SessionPlanningController::class, 'create'])
+        ->name('session.planning.create');
+    Route::post('/responsable/session-planning', [SessionPlanningController::class, 'store'])
+        ->name('session.planning.store');
+    Route::get('/groups/{group}/planning-calendar', [SessionPlanningController::class, 'showCalendar'])
+        ->name('planning.calendar');
+    */
 
-    // Exam Plan routes - Responsable (Create, Read, Update, Delete)
+    // Exam routes with additional functionality
+    Route::post('/exams/check-availability', [ExamController::class, 'checkAvailability'])->name('exams.check-availability');
+    Route::post('/exams/suggest-rooms', [ExamController::class, 'suggestRooms'])->name('exams.suggest-rooms');
+    Route::post('/exams/suggest-teachers', [ExamController::class, 'suggestTeachers'])->name('exams.suggest-teachers');
+    
+    Route::get('/session/planning/create/{group}', function ($group) {
+        return Inertia::render('Responsable/SessionPlanning', ['groupId' => $group]);
+    })->name('session.planning.create');
+    
+    Route::get('/groups/create', function () {
+        return Inertia::render('Responsable/Groups/Create');
+    })->name('groups.create');
+
+    // Room management routes
+    Route::get('/salles', [RoomController::class, 'index'])->name('rooms.index');
+    Route::post('/salles', [RoomController::class, 'store'])->name('rooms.store');
+    Route::put('/salles/{room}', [RoomController::class, 'update'])->name('rooms.update');
+    Route::delete('/salles/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
+
+    // Module management routes
+    Route::get('/modules', [ModuleController::class, 'index'])->name('modules.index');
+    Route::post('/modules', [ModuleController::class, 'store'])->name('modules.store');
+    Route::put('/modules/{module}', [ModuleController::class, 'update'])->name('modules.update');
+    Route::delete('/modules/{module}', [ModuleController::class, 'destroy'])->name('modules.destroy');
+
+    // API routes
+    Route::get('/api/academic/structure', [AcademicStructureController::class, 'getAcademicStructure']);
+    Route::get('/api/academic/system/{systemId}/levels', [AcademicStructureController::class, 'getLevelsBySystem']);
+    Route::get('/api/academic/levels/{levelId}/semesters', [AcademicStructureController::class, 'getSemestersByLevel']);
+    Route::get('/api/academic/levels/{levelId}/specialities', [AcademicStructureController::class, 'getSpecialitiesByLevel']);
+    Route::get('/api/academic/levels/all', [AcademicStructureController::class, 'getAllLevels']);
+    Route::get('/api/academic/specialities/all', [AcademicStructureController::class, 'getAllSpecialities']);
+
+    // Report routes
+    Route::get('/Headdepartment/Report', [\App\Http\Controllers\ReportController::class, 'headdepartment'])
+        ->name('headdepartment.report');
+    
+    Route::get('/Responsable/Report', [\App\Http\Controllers\ReportController::class, 'responsable'])
+        ->name('responsable.report');
+    
+    // Exam Plan routes - Responsable (Create, Manage)
     Route::prefix('responsable/exam-plans')->group(function () {
         Route::get('/', [ResponsableExamPlanController::class, 'index'])->name('responsable.exam-plans.index');
         Route::get('/create', [ResponsableExamPlanController::class, 'create'])->name('responsable.exam-plans.create');
@@ -188,7 +257,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{examPlan}', [ResponsableExamPlanController::class, 'destroy'])->name('responsable.exam-plans.destroy');
     });
     
-    // Exam Plan routes - Headdepartment (Validate, Read)
+    // Exam Plan routes - Headdepartment (Validate)
     Route::prefix('headdepartment/exam-plans')->group(function () {
         Route::get('/', [HeaddepartmentExamPlanController::class, 'index'])->name('headdepartment.exam-plans.index');
         Route::get('/{examPlan}', [HeaddepartmentExamPlanController::class, 'show'])->name('headdepartment.exam-plans.show');
@@ -216,15 +285,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/{request}', [TeacherReqController::class, 'show'])->name('teacher.requests.show');
     });
     
-    // Report routes
-    Route::get('/headdepartment/report', [\App\Http\Controllers\ReportController::class, 'headdepartment'])
-        ->name('headdepartment.report');
-    Route::get('/Responsable/Report', [\App\Http\Controllers\ReportController::class, 'responsable'])
-        ->name('responsable.report');
     Route::get('/Teacher/Report', [\App\Http\Controllers\ReportController::class, 'teacher'])
         ->name('teacher.report');
+    
     Route::get('/Student/Report', [\App\Http\Controllers\ReportController::class, 'student'])
         ->name('student.report');
 });
-
-require __DIR__.'/auth.php';
