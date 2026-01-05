@@ -4,17 +4,25 @@ namespace App\Http\Controllers\Headdepartment;
 
 use App\Http\Controllers\Controller;
 use App\Models\TeacherRequest;
-use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class TeacherRequestController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (auth()->check() && auth()->user()->role !== 'headdepartment') {
+                abort(403); 
+            }
+            return $next($request); 
+        });
+    }
+
     /**
      * Display teacher requests management page.
      */
-    public function index(): Response
+    public function index()
     {
         $requests = TeacherRequest::with(['teacher.user', 'module'])
             ->orderBy('created_at', 'desc')
@@ -22,8 +30,8 @@ class TeacherRequestController extends Controller
             ->map(function ($request) {
                 return [
                     'id' => $request->id,
-                    'teacher_name' => $request->teacher->first_name . ' ' . $request->teacher->last_name,
-                    'teacher_email' => $request->teacher->user->email,
+                    'teacher_name' => $request->teacher ? $request->teacher->first_name . ' ' . $request->teacher->last_name : 'Unknown',
+                    'teacher_email' => $request->teacher ? $request->teacher->user->email : 'N/A',
                     'module_name' => $request->module ? $request->module->module_name : 'N/A',
                     'type' => $request->type,
                     'title' => $request->title,
@@ -37,48 +45,46 @@ class TeacherRequestController extends Controller
                 ];
             });
 
-        // Statistics
-        $stats = [
-            'total_requests' => $requests->count(),
-            'pending_requests' => $requests->where('status', 'pending')->count(),
-            'approved_requests' => $requests->where('status', 'approved')->count(),
-            'rejected_requests' => $requests->where('status', 'rejected')->count(),
-        ];
-
-        return Inertia::render('Responsable/TeacherRequests', [
+        return Inertia::render('Headdepartment/TeacherRequests', [
             'requests' => $requests,
-            'stats' => $stats,
         ]);
     }
 
     /**
      * Update request status.
      */
-    public function updateStatus(Request $request, TeacherRequest $teacherRequest)
+    public function updateStatus(Request $request, $id)
     {
+        $teacherRequest = TeacherRequest::findOrFail($id);
+
         $validated = $request->validate([
             'status' => 'required|in:pending,approved,rejected',
-            'reason' => 'nullable|string|max:500',
+            'admin_notes' => 'nullable|string|max:1000',
         ]);
 
         $teacherRequest->update([
             'status' => $validated['status'],
-            'admin_notes' => $validated['reason'] ?? null,
+            'admin_notes' => $validated['admin_notes'],
             'processed_at' => now(),
         ]);
 
+        $message = $validated['status'] === 'approved' 
+            ? 'Teacher request approved successfully.' 
+            : 'Teacher request rejected.';
+
         return redirect()->back()
-            ->with('success', 'Request status updated successfully.');
+            ->with('success', $message);
     }
 
     /**
      * Delete a request.
      */
-    public function destroy(TeacherRequest $teacherRequest)
+    public function destroy($id)
     {
+        $teacherRequest = TeacherRequest::findOrFail($id);
         $teacherRequest->delete();
 
         return redirect()->back()
-            ->with('success', 'Request deleted successfully.');
+            ->with('success', 'Teacher request deleted successfully.');
     }
 }
