@@ -84,9 +84,9 @@ export default function AuthenticatedLayout({ children, header }) {
                                 <Menu size={24} />
                             </button>
                             
-                            <h1 className="text-lg font-semibold text-black dark:text-white">
+                            <div className="text-lg font-semibold text-black dark:text-white">
                                 {header || 'Dashboard'}
-                            </h1>
+                            </div>
                         </div>
 
                         <div className="flex items-center space-x-4">

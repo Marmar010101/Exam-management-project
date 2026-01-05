@@ -7,6 +7,16 @@ use Inertia\Inertia;
 
 class TeacherController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (auth()->check() && auth()->user()->role !== 'teacher') {
+                abort(403); 
+            }
+            return $next($request); 
+        });
+    }
+
     public function index()
     {
         return Inertia::render('Teacher/Dashboard', [
