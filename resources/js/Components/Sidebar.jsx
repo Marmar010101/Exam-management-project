@@ -33,49 +33,49 @@ export default function Sidebar({ role, isMobile = false, onClose }) {
             { key: 'report', label: 'Report', route: 'headdepartment.report', icon: <FileBarChart size={18} /> },
         ],
       responsable: [
-    {
-        key: 'dashboard',
-        label: 'Dashboard',
-        route: 'responsable.dashboard',
-        icon: <LayoutDashboard size={18} />,
-    },
-    {
-        key: 'exam_plans',
-        label: 'Exam Plans',
-        route: 'responsable.planning.calendar',
-        icon: <Calendar size={18} />,
-    },
-    {
-        key: 'exams',
-        label: 'Exams',
-        route: 'responsable.exams',
-        icon: <GraduationCap size={18} />,
-    },
-    {
-        key: 'invigilation',
-        label: 'Invigilation',
-        route: 'responsable.invigilation',
-        icon: <Users size={18} />,
-    },
-    {
-        key: 'calendars',
-        label: 'Calendars',
-        route: 'responsable.calendars',
-        icon: <CalendarDays size={18} />,
-    },
-    {
-        key: 'teacher_requests',
-        label: 'Teacher Requests',
-        route: 'responsable.teacher_requests',
-        icon: <Bell size={18} />,
-    },
-    {
-        key: 'report',
-        label: 'Report',
-        route: 'responsable.report',
-        icon: <FileBarChart size={18} />,
-    },
-],
+        {
+            key: 'dashboard',
+            label: 'Dashboard',
+            route: 'responsable.dashboard',
+            icon: <LayoutDashboard size={18} />,
+        },
+        {
+            key: 'exam_plans',
+            label: 'Exam Plans',
+            route: 'responsable.exam-plans.index',
+            icon: <Calendar size={18} />,
+        },
+        {
+            key: 'exams',
+            label: 'Exams',
+            route: 'responsable.exams',
+            icon: <GraduationCap size={18} />,
+        },
+        {
+            key: 'invigilation',
+            label: 'Invigilation',
+            route: 'responsable.invigilation',
+            icon: <Users size={18} />,
+        },
+        {
+            key: 'calendars',
+            label: 'Calendars',
+            route: 'responsable.planning.calendar',
+            icon: <CalendarDays size={18} />,
+        },
+        {
+            key: 'teacher_requests',
+            label: 'Teacher Requests',
+            route: 'responsable.teacher_requests',
+            icon: <Bell size={18} />,
+        },
+        {
+            key: 'report',
+            label: 'Report',
+            route: 'responsable.report',
+            icon: <FileBarChart size={18} />,
+        },
+    ],
 
         
         teacher: [
