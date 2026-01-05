@@ -19,6 +19,7 @@ export default forwardRef(function TextInput({ type = 'text', className = '', is
                     className
                 }
                 ref={input}
+                value={props.value || ''}
             />
         </div>
     );
