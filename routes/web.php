@@ -156,12 +156,6 @@ Route::middleware('auth')->group(function () {
         ->name('headdepartment.exams.update');
     Route::delete('/HeadDepartment/Exams/{exam}', [ExamController::class, 'destroy'])
         ->name('headdepartment.exams.destroy');
-    Route::get('/HeadDepartment/TeacherRequests', [\App\Http\Controllers\Headdepartment\TeacherRequestController::class, 'index'])
-        ->name('headdepartment.teacher_requests');
-    Route::put('/HeadDepartment/TeacherRequests/{teacherRequest}', [\App\Http\Controllers\Headdepartment\TeacherRequestController::class, 'update'])
-        ->name('headdepartment.teacher_requests.update');
-    Route::delete('/HeadDepartment/TeacherRequests/{teacherRequest}', [\App\Http\Controllers\Headdepartment\TeacherRequestController::class, 'destroy'])
-        ->name('headdepartment.teacher_requests.destroy');
     Route::get('/HeadDepartment/Modules', [ModuleController::class, 'index'])
         ->name('headdepartment.modules');
     Route::post('/HeadDepartment/Modules', [ModuleController::class, 'store'])
