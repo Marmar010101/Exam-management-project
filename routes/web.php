@@ -122,35 +122,35 @@ Route::middleware('auth')->group(function () {
         ->name('teacher.requests_alerts');
 
     // Head Department routes
-    Route::get('/headdepartment/account_management/management', [UserManagementController::class, 'index'])
+    Route::get('/HeadDepartment/AccountManagement/Management', [UserManagementController::class, 'index'])
         ->name('headdepartment.management');
-    Route::get('/headdepartment/exams-planing', [ExamsPlanningController::class, 'index'])
+    Route::get('/HeadDepartment/ExamsPlanning', [ExamsPlanningController::class, 'index'])
         ->name('headdepartment.exams_planing');
-    Route::get('/headdepartment/exams', [ExamController::class, 'index'])
+    Route::get('/HeadDepartment/Exams', [ExamController::class, 'index'])
         ->name('headdepartment.exams');
-    Route::post('/headdepartment/exams', [ExamController::class, 'store'])
+    Route::post('/HeadDepartment/Exams', [ExamController::class, 'store'])
         ->name('headdepartment.exams.store');
-    Route::put('/headdepartment/exams/{exam}', [ExamController::class, 'update'])
+    Route::put('/HeadDepartment/Exams/{exam}', [ExamController::class, 'update'])
         ->name('headdepartment.exams.update');
-    Route::delete('/headdepartment/exams/{exam}', [ExamController::class, 'destroy'])
+    Route::delete('/HeadDepartment/Exams/{exam}', [ExamController::class, 'destroy'])
         ->name('headdepartment.exams.destroy');
-    Route::get('/headdepartment/teacher-requests', [\App\Http\Controllers\Headdepartment\TeacherRequestController::class, 'index'])
+    Route::get('/HeadDepartment/TeacherRequests', [\App\Http\Controllers\Headdepartment\TeacherRequestController::class, 'index'])
         ->name('headdepartment.teacher_requests');
-    Route::put('/headdepartment/teacher-requests/{teacherRequest}', [\App\Http\Controllers\Headdepartment\TeacherRequestController::class, 'update'])
+    Route::put('/HeadDepartment/TeacherRequests/{teacherRequest}', [\App\Http\Controllers\Headdepartment\TeacherRequestController::class, 'update'])
         ->name('headdepartment.teacher_requests.update');
-    Route::delete('/headdepartment/teacher-requests/{teacherRequest}', [\App\Http\Controllers\Headdepartment\TeacherRequestController::class, 'destroy'])
+    Route::delete('/HeadDepartment/TeacherRequests/{teacherRequest}', [\App\Http\Controllers\Headdepartment\TeacherRequestController::class, 'destroy'])
         ->name('headdepartment.teacher_requests.destroy');
-    Route::get('/headdepartment/modules', [ModuleController::class, 'index'])
+    Route::get('/HeadDepartment/Modules', [ModuleController::class, 'index'])
         ->name('headdepartment.modules');
-    Route::post('/headdepartment/modules', [ModuleController::class, 'store'])
+    Route::post('/HeadDepartment/Modules', [ModuleController::class, 'store'])
         ->name('headdepartment.modules.store');
-    Route::put('/headdepartment/modules/{module}', [ModuleController::class, 'update'])
+    Route::put('/HeadDepartment/Modules/{module}', [ModuleController::class, 'update'])
         ->name('headdepartment.modules.update');
-    Route::delete('/headdepartment/modules/{module}', [ModuleController::class, 'destroy'])
+    Route::delete('/HeadDepartment/Modules/{module}', [ModuleController::class, 'destroy'])
         ->name('headdepartment.modules.destroy');
-    Route::get('/headdepartment/salles', fn()=>Inertia::render('headdepartment/salles'))
+    Route::get('/HeadDepartment/Salles', fn()=>Inertia::render('headdepartment/salles'))
         ->name('headdepartment.salles');
-    Route::get('/headdepartment/notifications', fn()=>Inertia::render('headdepartment/notifications'))
+    Route::get('/HeadDepartment/Notifications', fn()=>Inertia::render('headdepartment/notifications'))
         ->name('headdepartment.notifications');
 
     // Responsable routes
@@ -229,7 +229,7 @@ Route::middleware('auth')->group(function () {
     });
     
     // Report routes
-    Route::get('/headdepartment/report', [\App\Http\Controllers\ReportController::class, 'headdepartment'])
+    Route::get('/HeadDepartment/Report', [\App\Http\Controllers\ReportController::class, 'headdepartment'])
         ->name('headdepartment.report');
     Route::get('/Responsable/Report', [\App\Http\Controllers\ReportController::class, 'responsable'])
         ->name('responsable.report');
