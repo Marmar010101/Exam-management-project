@@ -89,7 +89,8 @@ export default function Sidebar({ role, isMobile = false, onClose }) {
         student: [
               { key: 'Dashboard', label: 'Dashboard', route: 'student.dashboard', icon: <LayoutDashboard size={18} /> },
               { key: 'my_exams', label: 'My Exams', route: 'student.my_exams', icon: <FileText size={18} /> },
-              { key: 'calendar', label: 'Calendar', route: 'student.calendar', icon: <Calendar size={18} /> },
+              { key: 'exam_plans', label: 'Exam Plans', route: 'student.exam-plans.index', icon: <Calendar size={18} /> },
+              { key: 'calendar', label: 'Calendar', route: 'student.calendar', icon: <CalendarDays size={18} /> },
               { key: 'report', label: 'Report', route: 'student.report', icon: <FileBarChart size={18} /> },
         ],
             
