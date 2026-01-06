@@ -18,8 +18,13 @@ import {
 export default function Sidebar({ role, isMobile = false, onClose }) {
     const { url } = usePage();
     
+    // Debug: Afficher le rôle reçu
+    console.log('Sidebar - Role reçu:', role);
+    
     // Normaliser le rôle pour gérer les deux variantes
     const normalizedRole = role === 'head_department' ? 'headdepartment' : role;
+    
+    console.log('Sidebar - Normalized role:', normalizedRole);
     
     const menus = {
         headdepartment: [
@@ -96,6 +101,10 @@ export default function Sidebar({ role, isMobile = false, onClose }) {
     };
 
     const items = menus[normalizedRole] || [];
+    
+    // Debug: Afficher les items du menu
+    console.log('Sidebar - Menu items:', items);
+    console.log('Sidebar - Available menus:', Object.keys(menus));
 
     const isActive = (routeName) => {
         // Utilise route().current() pour vérifier si la route actuelle correspond
