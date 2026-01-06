@@ -146,7 +146,7 @@ Route::middleware('auth')->group(function () {
     // Head Department routes
     Route::get('/HeadDepartment/AccountManagement/Management', [UserManagementController::class, 'index'])
         ->name('headdepartment.management');
-    Route::get('/HeadDepartment/ExamsPlanning', [ExamsPlanningController::class, 'index'])
+    Route::get('/HeadDepartment/exams_planing', [ExamsPlanningController::class, 'index'])
         ->name('headdepartment.exams_planing');
     Route::get('/HeadDepartment/Exams', [ExamController::class, 'index'])
         ->name('headdepartment.exams');
@@ -174,7 +174,7 @@ Route::middleware('auth')->group(function () {
         ->name('headdepartment.salles');
     Route::get('/HeadDepartment/Notifications', fn()=>Inertia::render('HeadDepartment/notifications'))
         ->name('headdepartment.notifications');
-         Route::get('/HeadDepartment/Report', [\App\Http\Controllers\ReportController::class, 'headdepartment'])
+    Route::get('/HeadDepartment/Report', [\App\Http\Controllers\ReportController::class, 'headdepartment'])
         ->name('headdepartment.report');
 
     // Responsable routes

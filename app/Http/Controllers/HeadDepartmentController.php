@@ -31,7 +31,7 @@ class HeadDepartmentController extends Controller
 
     public function index()
     {
-      return Inertia::render('HeadDepartment/Dashboard', [
+      return Inertia::render('HeadDepartment/dashboard', [
             'status' => session('status'),
         ]);
     }
