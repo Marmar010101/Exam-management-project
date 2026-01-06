@@ -104,6 +104,12 @@ export default function Sidebar({ role, isMobile = false, onClose }) {
     console.log('Sidebar - Available menus:', Object.keys(menus));
 
     const items = menus[normalizedRole] || [];
+    
+    // Debug: Afficher les items sélectionnés
+    console.log('Sidebar - Normalized role:', normalizedRole);
+    console.log('Sidebar - Selected items:', items);
+    console.log('Sidebar - Items length:', items.length);
+    console.log('Sidebar - Available menu keys:', Object.keys(menus));
 
     const isActive = (routeName) => {
         // Utilise route().current() pour vérifier si la route actuelle correspond
