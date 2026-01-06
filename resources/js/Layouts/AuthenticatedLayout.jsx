@@ -9,6 +9,10 @@ export default function AuthenticatedLayout({ children, header }) {
     const user = auth.user;
     const role = user.role;
 
+    // Debug: Afficher le rôle détecté
+    console.log('AuthenticatedLayout - User role:', role);
+    console.log('AuthenticatedLayout - User:', user);
+
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth >= 768) {
