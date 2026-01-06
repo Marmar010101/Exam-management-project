@@ -98,29 +98,29 @@ Route::middleware('auth')->group(function () {
     })->name('dashboard');
 
     // Dashboard routes by role
-    Route::get('/headdepartment/Dashboard', [HeadDepartmentController::class, 'index'])
+    Route::get('/headdepartment/dashboard', [HeadDepartmentController::class, 'index'])
         ->name('headdepartment.dashboard');
     
-    Route::get('/Responsable/Dashboard', [ResponsableDashboardController::class, 'index'])
+    Route::get('/responsable/dashboard', [ResponsableDashboardController::class, 'index'])
         ->name('responsable.dashboard');
     
-    Route::get('/Student/Dashboard', [StudentController::class, 'index'])
+    Route::get('/student/dashboard', [StudentController::class, 'index'])
         ->name('student.dashboard');
 
     // Student routes
-    Route::get('/Student/MyExams', [StudentController::class, 'myExams'])->name('student.my_exams');
-    Route::get('/Student/Calendar', [StudentController::class, 'calendar'])->name('student.calendar');
+    Route::get('/student/my-exams', [StudentController::class, 'myExams'])->name('student.my_exams');
+    Route::get('/student/calendar', [StudentController::class, 'calendar'])->name('student.calendar');
 
     // Teacher routes
-    Route::get('/Teacher/Dashboard', [TeacherController::class, 'index'])
+    Route::get('/teacher/dashboard', [TeacherController::class, 'index'])
         ->name('teacher.dashboard');
-    Route::get('/Teacher/Surveillance', [TeacherController::class, 'surveillance'])
+    Route::get('/teacher/surveillance', [TeacherController::class, 'surveillance'])
         ->name('teacher.surveillance');
-    Route::get('/Teacher/Exams', [TeacherController::class, 'exams'])
+    Route::get('/teacher/exams', [TeacherController::class, 'exams'])
         ->name('teacher.exams');
-    Route::get('/Teacher/Modules', [TeacherController::class, 'modules'])
+    Route::get('/teacher/modules', [TeacherController::class, 'modules'])
         ->name('teacher.modules');
-    Route::get('/Teacher/RequestsAlerts', [TeacherController::class, 'requestsAlerts'])
+    Route::get('/teacher/requests-alerts', [TeacherController::class, 'requestsAlerts'])
         ->name('teacher.requests_alerts');
 
     // Head Department routes
@@ -156,47 +156,40 @@ Route::middleware('auth')->group(function () {
         ->name('headdepartment.notifications');
 
     // Responsable routes
-    Route::get('/Responsable/Dashboard', function () {
-        return Inertia::render('Responsable/Dashboard');
-    })->name('responsable.dashboard');
-
-    Route::get('/Responsable/GroupsIndex', function () {
+    Route::get('/responsable/groups', function () {
         return Inertia::render('Responsable/GroupsIndex');
     })->name('responsable.groups');
 
-    Route::get('/Responsable/Exams/Index', [\App\Http\Controllers\Headdepartment\ExamController::class, 'index'])
+    Route::get('/responsable/exams', [\App\Http\Controllers\Headdepartment\ExamController::class, 'index'])
         ->name('responsable.exams');
-    Route::get('/Responsable/Exams/Create', [\App\Http\Controllers\Headdepartment\ExamController::class, 'create'])
+    Route::get('/responsable/exams/create', [\App\Http\Controllers\Headdepartment\ExamController::class, 'create'])
         ->name('responsable.exams.create');
-    Route::post('/Responsable/Exams', [\App\Http\Controllers\Headdepartment\ExamController::class, 'store'])
+    Route::post('/responsable/exams', [\App\Http\Controllers\Headdepartment\ExamController::class, 'store'])
         ->name('responsable.exams.store');
-    Route::get('/Responsable/Exams/{exam}', [\App\Http\Controllers\Headdepartment\ExamController::class, 'show'])
+    Route::get('/responsable/exams/{exam}', [\App\Http\Controllers\Headdepartment\ExamController::class, 'show'])
         ->name('responsable.exams.show');
-    Route::put('/Responsable/Exams/{exam}', [\App\Http\Controllers\Headdepartment\ExamController::class, 'update'])
+    Route::put('/responsable/exams/{exam}', [\App\Http\Controllers\Headdepartment\ExamController::class, 'update'])
         ->name('responsable.exams.update');
-    Route::delete('/Responsable/Exams/{exam}', [\App\Http\Controllers\Headdepartment\ExamController::class, 'destroy'])
+    Route::delete('/responsable/exams/{exam}', [\App\Http\Controllers\Headdepartment\ExamController::class, 'destroy'])
         ->name('responsable.exams.destroy');
 
-    Route::get('/Responsable/Invigilation', [InvigilationController::class, 'index'])
+    Route::get('/responsable/invigilation', [InvigilationController::class, 'index'])
         ->name('responsable.invigilation');
     
-    Route::get('/Responsable/TeacherRequests', [ResponsableTeacherRequestController::class, 'index'])
+    Route::get('/responsable/teacher-requests', [ResponsableTeacherRequestController::class, 'index'])
         ->name('responsable.teacher_requests');
-    Route::put('/Responsable/TeacherRequests/{teacherRequest}', [ResponsableTeacherRequestController::class, 'update'])
+    Route::put('/responsable/teacher-requests/{teacherRequest}', [ResponsableTeacherRequestController::class, 'update'])
         ->name('responsable.teacher_requests.update');
-    Route::delete('/Responsable/TeacherRequests/{teacherRequest}', [ResponsableTeacherRequestController::class, 'destroy'])
+    Route::delete('/responsable/teacher-requests/{teacherRequest}', [ResponsableTeacherRequestController::class, 'destroy'])
         ->name('responsable.teacher_requests.destroy');
     
-    Route::get('/Responsable/PlanningCalendar', function () {
+    Route::get('/responsable/planning-calendar', function () {
         return Inertia::render('Responsable/PlanningCalendar');
     })->name('responsable.planning.calendar');
     
-    Route::get('/Responsable/SessionPlanning', function () {
+    Route::get('/responsable/session-planning', function () {
         return Inertia::render('Responsable/SessionPlanning');
     })->name('responsable.session.planning');
-    
-    Route::get('/Responsable/TeacherRequests', [\App\Http\Controllers\Responsable\TeacherRequestController::class, 'index'])
-        ->name('responsable.teacher_requests');
 
     // Exam Plan routes - Responsable (Create, Read, Update, Delete)
     Route::prefix('responsable/exam-plans')->group(function () {
