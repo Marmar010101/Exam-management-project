@@ -25,7 +25,6 @@ export default function Sidebar({ role, isMobile = false, onClose }) {
     const normalizedRole = role === 'head_department' ? 'headdepartment' : role;
     
     console.log('Sidebar - Normalized role:', normalizedRole);
-    console.log('Sidebar - Available menus:', Object.keys(menus));
     
     const menus = {
         headdepartment: [
@@ -102,11 +101,12 @@ export default function Sidebar({ role, isMobile = false, onClose }) {
             
     };
 
+    console.log('Sidebar - Available menus:', Object.keys(menus));
+
     const items = menus[normalizedRole] || [];
 
     const isActive = (routeName) => {
         // Utilise route().current() pour vérifier si la route actuelle correspond
-        // Cela fonctionne si vous utilisez les routes nommées d'Inertia
         return route().current(routeName);
         
         // Alternative si la méthode ci-dessus ne fonctionne pas :
