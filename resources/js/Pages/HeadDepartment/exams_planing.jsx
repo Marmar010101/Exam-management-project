@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 export default function Exams_planning({ examPlans = [], stats = {} }) {
-    const { flash } = usePage().props;
+    const { flash = {} } = usePage().props;
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [showValidationModal, setShowValidationModal] = useState(false);
@@ -32,10 +32,10 @@ export default function Exams_planning({ examPlans = [], stats = {} }) {
     const [validationAction, setValidationAction] = useState('validate'); // 'validate' or 'reject'
 
     // Filtrer les exam plans
-    const filteredPlans = examPlans.filter(plan => {
-        const matchesSearch = plan.group_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            plan.module_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            plan.teacher_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const filteredPlans = (examPlans || []).filter(plan => {
+        const matchesSearch = (plan.group_name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+                            (plan.module_name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+                            (plan.teacher_name || '').toLowerCase().includes((searchTerm || '').toLowerCase());
         
         const matchesStatus = statusFilter === 'all' || plan.status === statusFilter;
         

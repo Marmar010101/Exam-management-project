@@ -4,7 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { CheckCircle, XCircle, Calendar, Clock, MapPin, Search, X, BookOpen, Eye, AlertCircle } from 'lucide-react';
 
 export default function Exams() {
-    const { exams, modules, rooms, flash } = usePage().props;
+    const { exams = [], modules = [], rooms = [], flash = {} } = usePage().props;
     const [searchTerm, setSearchTerm] = useState('');
     const [showValidationModal, setShowValidationModal] = useState(false);
     const [selectedExam, setSelectedExam] = useState(null);
@@ -12,10 +12,10 @@ export default function Exams() {
     const [validationAction, setValidationAction] = useState('validate'); // 'validate' or 'reject'
 
     // Filtrer les examens
-    const filteredExams = exams.filter(exam => 
-        exam.module_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        exam.room_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        exam.exam_date.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredExams = (exams || []).filter(exam => 
+        (exam.module_name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+        (exam.room_name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+        (exam.exam_date || '').toLowerCase().includes((searchTerm || '').toLowerCase())
     );
 
     const handleValidate = (exam, action) => {
