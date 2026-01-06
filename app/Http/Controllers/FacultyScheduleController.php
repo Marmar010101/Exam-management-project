@@ -21,79 +21,145 @@ class FacultyScheduleController extends Controller
         $faculty = $request->get('faculty', 'L1');
         $speciality = $request->get('speciality', 'Informatique');
 
-        // Get groups for this faculty and speciality
-        $groups = Group::with(['students'])
-            ->whereHas('level', function($query) use ($faculty) {
-                $query->where('name', $faculty);
-            })
-            ->whereHas('speciality', function($query) use ($speciality) {
-                $query->where('name', $speciality);
-            })
-            ->get()
-            ->map(function ($group) {
-                return [
-                    'id' => $group->id,
-                    'name' => $group->name,
-                    'students' => $group->students->map(function ($student) {
-                        return [
-                            'id' => $student->id,
-                            'first_name' => $student->first_name,
-                            'last_name' => $student->last_name,
-                            'matricule' => $student->matricule,
-                        ];
-                    }),
-                ];
-            });
+        // Mock data for testing - replace with real queries later
+        $groups = [
+            [
+                'id' => 1,
+                'name' => 'Groupe 1',
+                'students' => [
+                    ['id' => 1, 'first_name' => 'Ahmed', 'last_name' => 'Mohamed', 'matricule' => 'STU001'],
+                    ['id' => 2, 'first_name' => 'Fatima', 'last_name' => 'Zahra', 'matricule' => 'STU002'],
+                    ['id' => 3, 'first_name' => 'Mohamed', 'last_name' => 'Ali', 'matricule' => 'STU003'],
+                ]
+            ],
+            [
+                'id' => 2,
+                'name' => 'Groupe 2',
+                'students' => [
+                    ['id' => 4, 'first_name' => 'Sara', 'last_name' => 'Ahmed', 'matricule' => 'STU004'],
+                    ['id' => 5, 'first_name' => 'Omar', 'last_name' => 'Hassan', 'matricule' => 'STU005'],
+                ]
+            ],
+            [
+                'id' => 3,
+                'name' => 'Groupe 3',
+                'students' => [
+                    ['id' => 6, 'first_name' => 'Leila', 'last_name' => 'Khaled', 'matricule' => 'STU006'],
+                    ['id' => 7, 'first_name' => 'Youssef', 'last_name' => 'Mansour', 'matricule' => 'STU007'],
+                ]
+            ]
+        ];
 
-        // Get modules for this faculty and speciality
-        $modules = Module::whereHas('level', function($query) use ($faculty) {
-                $query->where('name', $faculty);
-            })
-            ->whereHas('speciality', function($query) use ($speciality) {
-                $query->where('name', $speciality);
-            })
-            ->get()
-            ->map(function ($module) {
-                return [
-                    'id' => $module->id,
-                    'module_name' => $module->module_name,
-                    'code' => $module->code,
-                ];
-            });
+        $modules = [
+            ['id' => 1, 'module_name' => 'Algorithmique', 'code' => 'ALG101'],
+            ['id' => 2, 'module_name' => 'Bases de Données', 'code' => 'BD101'],
+            ['id' => 3, 'module_name' => 'Réseaux', 'code' => 'RES101'],
+            ['id' => 4, 'module_name' => 'Programmation Web', 'code' => 'WEB101'],
+            ['id' => 5, 'module_name' => 'Intelligence Artificielle', 'code' => 'IA101'],
+            ['id' => 6, 'module_name' => 'Systèmes d\'Exploitation', 'code' => 'SE101'],
+        ];
 
-        // Get teachers with their modules
-        $teachers = Teacher::with(['user'])
-            ->whereHas('modules', function($query) use ($modules) {
-                $moduleIds = $modules->pluck('id')->toArray();
-                $query->whereIn('modules.id', $moduleIds);
-            })
-            ->get()
-            ->map(function ($teacher) use ($modules) {
-                // Get teacher's modules
-                $teacherModules = $teacher->modules()
-                    ->whereIn('modules.id', $modules->pluck('id'))
-                    ->get()
-                    ->map(function ($module) {
-                        return [
-                            'id' => $module->id,
-                            'module_name' => $module->module_name,
-                        ];
-                    });
+        $teachers = [
+            [
+                'id' => 1,
+                'first_name' => 'Dr. Omar',
+                'last_name' => 'Hassan',
+                'department' => 'Informatique',
+                'speciality' => 'IA',
+                'grade' => 'Professeur',
+                'is_responsable' => true,
+                'modules' => [['id' => 1, 'module_name' => 'Algorithmique'], ['id' => 2, 'module_name' => 'Bases de Données']]
+            ],
+            [
+                'id' => 2,
+                'first_name' => 'Dr. Fatima',
+                'last_name' => 'Zahra',
+                'department' => 'Informatique',
+                'speciality' => 'Réseaux',
+                'grade' => 'Professeur',
+                'is_responsable' => false,
+                'modules' => [['id' => 3, 'module_name' => 'Réseaux']]
+            ],
+            [
+                'id' => 3,
+                'first_name' => 'Dr. Mohamed',
+                'last_name' => 'Ali',
+                'department' => 'Informatique',
+                'speciality' => 'Web',
+                'grade' => 'Maître Assistant',
+                'is_responsable' => false,
+                'modules' => [['id' => 4, 'module_name' => 'Programmation Web']]
+            ]
+        ];
 
-                return [
-                    'id' => $teacher->id,
-                    'first_name' => $teacher->user->first_name,
-                    'last_name' => $teacher->user->last_name,
-                    'department' => $teacher->department,
-                    'speciality' => $teacher->speciality,
-                    'grade' => $teacher->grade,
-                    'is_responsable' => $teacher->is_responsable,
-                    'modules' => $teacherModules,
-                ];
-            });
-
-        // Build schedule from exam plans
-        $schedule = $this->buildSchedule($faculty, $speciality);
+        // Mock schedule data
+        $schedule = [
+            'Lundi' => [
+                '08:00-09:30' => [
+                    1 => [
+                        'id' => 1,
+                        'exam_type' => 'Final',
+                        'module_name' => 'Algorithmique',
+                        'teacher_name' => 'Dr. Omar Hassan',
+                        'room_name' => 'Salle A101'
+                    ]
+                ],
+                '09:30-11:00' => [
+                    3 => [
+                        'id' => 2,
+                        'exam_type' => 'Midterm',
+                        'module_name' => 'Réseaux',
+                        'teacher_name' => 'Dr. Fatima Zahra',
+                        'room_name' => 'Salle B201'
+                    ]
+                ]
+            ],
+            'Mardi' => [
+                '14:00-15:30' => [
+                    2 => [
+                        'id' => 3,
+                        'exam_type' => 'Final',
+                        'module_name' => 'Bases de Données',
+                        'teacher_name' => 'Dr. Omar Hassan',
+                        'room_name' => 'Salle C301'
+                    ]
+                ]
+            ],
+            'Mercredi' => [
+                '10:00-11:30' => [
+                    4 => [
+                        'id' => 4,
+                        'exam_type' => 'Quiz',
+                        'module_name' => 'Programmation Web',
+                        'teacher_name' => 'Dr. Mohamed Ali',
+                        'room_name' => 'Salle D101'
+                    ]
+                ]
+            ],
+            'Jeudi' => [
+                '15:30-17:00' => [
+                    5 => [
+                        'id' => 5,
+                        'exam_type' => 'Practical',
+                        'module_name' => 'Intelligence Artificielle',
+                        'teacher_name' => 'Dr. Omar Hassan',
+                        'room_name' => 'Salle A102'
+                    ]
+                ]
+            ],
+            'Vendredi' => [
+                '11:00-12:30' => [
+                    6 => [
+                        'id' => 6,
+                        'exam_type' => 'Oral',
+                        'module_name' => 'Systèmes d\'Exploitation',
+                        'teacher_name' => 'Dr. Fatima Zahra',
+                        'room_name' => 'Salle B202'
+                    ]
+                ]
+            ],
+            'Samedi' => []
+        ];
 
         return Inertia::render('HeadDepartment/FacultySchedule', [
             'faculty' => $faculty,
