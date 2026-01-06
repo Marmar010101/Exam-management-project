@@ -109,6 +109,10 @@ Route::middleware('auth')->group(function () {
 
     // Student routes
     Route::get('/Student/MyExams', [StudentController::class, 'myExams'])->name('student.my_exams');
+    Route::get('/Student/ExamPlans', [\App\Http\Controllers\Student\ExamPlanController::class, 'index'])
+        ->name('student.exam-plans.index');
+    Route::get('/Student/ExamPlans/{examPlan}', [\App\Http\Controllers\Student\ExamPlanController::class, 'show'])
+        ->name('student.exam-plans.show');
     Route::get('/Student/Calendar', [StudentController::class, 'calendar'])->name('student.calendar');
 
     // Teacher routes
