@@ -170,10 +170,12 @@ Route::middleware('auth')->group(function () {
         ->name('headdepartment.modules.update');
     Route::delete('/HeadDepartment/Modules/{module}', [ModuleController::class, 'destroy'])
         ->name('headdepartment.modules.destroy');
-    Route::get('/HeadDepartment/Salles', fn()=>Inertia::render('headdepartment/salles'))
+    Route::get('/HeadDepartment/Salles', fn()=>Inertia::render('HeadDepartment/salles'))
         ->name('headdepartment.salles');
-    Route::get('/HeadDepartment/Notifications', fn()=>Inertia::render('headdepartment/notifications'))
+    Route::get('/HeadDepartment/Notifications', fn()=>Inertia::render('HeadDepartment/notifications'))
         ->name('headdepartment.notifications');
+         Route::get('/HeadDepartment/Report', [\App\Http\Controllers\ReportController::class, 'headdepartment'])
+        ->name('headdepartment.report');
 
     // Responsable routes
     Route::get('/Responsable/GroupsIndex', function () {
