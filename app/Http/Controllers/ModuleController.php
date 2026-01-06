@@ -36,7 +36,7 @@ class ModuleController extends Controller
         $semesters = Semester::all(['id', 'name']);
         $filieres = \App\Models\Filiere::all(['id', 'name']);
 
-        return Inertia::render('headdepartment/modules', [
+        return Inertia::render('HeadDepartment/modules', [
             'modules' => $modules,
             'specialities' => $specialities,
             'levels' => $levels,

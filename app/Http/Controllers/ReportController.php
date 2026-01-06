@@ -54,7 +54,7 @@ class ReportController extends Controller
                 return $group->count();
             });
 
-        return Inertia::render('Headdepartment/Report', [
+        return Inertia::render('HeadDepartment/report', [
             'stats' => $stats,
             'usersByRole' => $usersByRole,
             'examsByMonth' => $examsByMonth,

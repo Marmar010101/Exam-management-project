@@ -45,7 +45,7 @@ class TeacherRequestController extends Controller
                 ];
             });
 
-        return Inertia::render('Headdepartment/TeacherRequests', [
+        return Inertia::render('HeadDepartment/teacher_requests', [
             'requests' => $requests,
         ]);
     }

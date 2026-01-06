@@ -41,7 +41,7 @@ class ExamController extends Controller
         })->get(['id', 'module_name', 'code']);
         $rooms = Room::all(['id', 'room_name']);
 
-        return Inertia::render('headdepartment/exams', [
+        return Inertia::render('HeadDepartment/exams', [
             'exams' => $exams,
             'modules' => $modules,
             'rooms' => $rooms

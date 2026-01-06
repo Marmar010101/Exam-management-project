@@ -55,7 +55,7 @@ class UserManagementController extends Controller
                 return $userData;
             });
 
-        return Inertia::render('headdepartment/account_management/management', [
+        return Inertia::render('HeadDepartment/account_management/management', [
             'users' => $users
         ]);
     }

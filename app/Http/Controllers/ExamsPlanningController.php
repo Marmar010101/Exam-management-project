@@ -110,7 +110,7 @@ class ExamsPlanningController extends Controller
             ['id' => 2, 'annee' => '2025-2026']
         ];
 
-        return Inertia::render('headdepartment/exams_planing', [
+        return Inertia::render('HeadDepartment/exams_planing', [
             'exams' => $exams,
             'groups' => $groups,
             'modules' => $modules,
