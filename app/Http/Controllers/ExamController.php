@@ -74,4 +74,36 @@ class ExamController extends Controller
         // Pour l'instant, juste retourner un message de succès
         return redirect()->back()->with('success', 'Examen supprimé avec succès! (Mock data)');
     }
+
+    /**
+     * Validate the specified exam.
+     */
+    public function validateExam(Request $request, $id)
+    {
+        $exam = Exam::findOrFail($id);
+
+        if ($exam->status !== 'pending') {
+            return redirect()->route('headdepartment.exams')
+                ->with('error', 'This exam has already been processed.');
+        }
+
+        $validated = $request->validate([
+            'action' => 'required|in:validate,reject',
+            'validation_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $exam->update([
+            'status' => $validated['action'] === 'validate' ? 'validated' : 'rejected',
+            'validated_by' => auth()->id(),
+            'validation_notes' => $validated['validation_notes'],
+            'validated_at' => now(),
+        ]);
+
+        $message = $validated['action'] === 'validate' 
+            ? 'Exam validated successfully.' 
+            : 'Exam rejected.';
+
+        return redirect()->route('headdepartment.exams')
+            ->with('success', $message);
+    }
 }

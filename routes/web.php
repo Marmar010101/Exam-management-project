@@ -156,6 +156,8 @@ Route::middleware('auth')->group(function () {
         ->name('headdepartment.exams.update');
     Route::delete('/HeadDepartment/Exams/{exam}', [ExamController::class, 'destroy'])
         ->name('headdepartment.exams.destroy');
+    Route::post('/HeadDepartment/Exams/{exam}/validate', [ExamController::class, 'validateExam'])
+        ->name('headdepartment.exams.validate');
     Route::get('/HeadDepartment/Modules', [ModuleController::class, 'index'])
         ->name('headdepartment.modules');
     Route::post('/HeadDepartment/Modules', [ModuleController::class, 'store'])
