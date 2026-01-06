@@ -31,6 +31,7 @@ export default function Sidebar({ role, isMobile = false, onClose }) {
             { key: 'Dashboard', label: 'Dashboard', route: 'headdepartment.dashboard', icon: <LayoutDashboard size={18} /> },
             { key: 'management', label: 'Accounts', route: 'headdepartment.management', icon: <Users size={18} /> },
             { key: 'exams_planing', label: 'Planning', route: 'headdepartment.exams_planing', icon: <Calendar size={18} /> },
+            { key: 'faculty_schedule', label: 'Faculty Schedule', route: 'headdepartment.faculty-schedule', icon: <Calendar size={18} /> },
             { key: 'exams', label: 'Exams', route: 'headdepartment.exams', icon: <FileText size={18} /> },
             { key: 'modules', label: 'Modules', route: 'headdepartment.modules', icon: <BookOpen size={18} /> },
             { key: 'salles', label: 'Classrooms', route: 'headdepartment.salles', icon: <Building size={18} /> },

@@ -152,6 +152,8 @@ Route::middleware('auth')->group(function () {
         ->name('headdepartment.exam-plans.show');
     Route::post('/HeadDepartment/exam-plans/{id}/validate', [\App\Http\Controllers\Headdepartment\ExamPlanController::class, 'validateExamPlan'])
         ->name('headdepartment.exam-plans.validate');
+    Route::get('/HeadDepartment/faculty-schedule', [FacultyScheduleController::class, 'index'])
+        ->name('headdepartment.faculty-schedule');
     Route::get('/HeadDepartment/Exams', [ExamController::class, 'index'])
         ->name('headdepartment.exams');
     Route::post('/HeadDepartment/Exams', [ExamController::class, 'store'])
