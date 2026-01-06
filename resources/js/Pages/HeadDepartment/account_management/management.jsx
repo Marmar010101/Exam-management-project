@@ -48,10 +48,10 @@ export default function Management() {
 
     const filteredUsers = users?.filter(user => 
         user.role === activeTab &&
-        (user.first_name.toLowerCase().includes(search.toLowerCase()) ||
-         user.last_name.toLowerCase().includes(search.toLowerCase()) ||
-         user.email.toLowerCase().includes(search.toLowerCase()) ||
-         user.matricule.toLowerCase().includes(search.toLowerCase()))
+        ((user.first_name || '').toLowerCase().includes(search.toLowerCase()) ||
+         (user.last_name || '').toLowerCase().includes(search.toLowerCase()) ||
+         (user.email || '').toLowerCase().includes(search.toLowerCase()) ||
+         (user.matricule || '').toLowerCase().includes(search.toLowerCase()))
     ) || [];
 
     const tabsWithCount = tabs.map(tab => ({
@@ -218,7 +218,7 @@ export default function Management() {
                                         <tr key={user.id} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className="text-sm font-mono text-gray-900">
-                                                    {user.matricule}
+                                                    {user.matricule || 'N/A'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -228,7 +228,7 @@ export default function Management() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium text-gray-900">
-                                                            {user.first_name} {user.last_name}
+                                                            {user.first_name || ''} {user.last_name || ''}
                                                         </p>
                                                         <p className="text-xs text-gray-500">
                                                             {user.role === 'student' ? 'Student' : 
@@ -240,7 +240,7 @@ export default function Management() {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className="text-sm text-gray-900">
-                                                    {user.email}
+                                                    {user.email || 'N/A'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
