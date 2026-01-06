@@ -38,6 +38,24 @@ use App\Http\Controllers\Responsable\TeacherRequestController as ResponsableTeac
 
 // PUBLIC ROUTES
 Route::get('/', function () {
+    // Si l'utilisateur est déjà connecté, rediriger vers son dashboard
+    if (auth()->check()) {
+        $user = auth()->user();
+        switch ($user->role) {
+            case 'headdepartment':
+                return redirect()->route('headdepartment.dashboard');
+            case 'responsable':
+                return redirect()->route('responsable.dashboard');
+            case 'teacher':
+                return redirect()->route('teacher.dashboard');
+            case 'student':
+                return redirect()->route('student.dashboard');
+            default:
+                return redirect()->route('login');
+        }
+    }
+    
+    // Sinon, afficher la page Welcome
     return Inertia::render('Welcome', [
         'canLogin' => true,
         'canRegister' => false, // Désactivé l'inscription
