@@ -64,6 +64,10 @@ export default function Exams_planning({ examPlans = [], stats = {} }) {
         });
     };
 
+    const handleViewDetails = (plan) => {
+        router.visit(`/headdepartment/exam-plans/${plan.id}`);
+    };
+
     const getStatusColor = (status) => {
         switch (status) {
             case 'pending': return 'bg-yellow-100 text-yellow-800';
@@ -263,8 +267,9 @@ export default function Exams_planning({ examPlans = [], stats = {} }) {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <div className="flex items-center space-x-2">
                                                         <button
-                                                            onClick={() => router.visit(`/headdepartment/exam-plans/${plan.id}`)}
+                                                            onClick={() => handleViewDetails(plan)}
                                                             className="text-blue-600 hover:text-blue-900"
+                                                            title="View Details"
                                                         >
                                                             <Eye size={16} />
                                                         </button>
@@ -273,12 +278,14 @@ export default function Exams_planning({ examPlans = [], stats = {} }) {
                                                                 <button
                                                                     onClick={() => handleValidate(plan, 'validate')}
                                                                     className="text-green-600 hover:text-green-900"
+                                                                    title="Validate"
                                                                 >
                                                                     <CheckCircle size={16} />
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleValidate(plan, 'reject')}
                                                                     className="text-red-600 hover:text-red-900"
+                                                                    title="Reject"
                                                                 >
                                                                     <XCircle size={16} />
                                                                 </button>
@@ -334,6 +341,9 @@ export default function Exams_planning({ examPlans = [], stats = {} }) {
                                 <div><strong>Time:</strong> {selectedPlan.formatted_time}</div>
                                 <div><strong>Teacher:</strong> {selectedPlan.teacher_name}</div>
                                 <div><strong>Room:</strong> {selectedPlan.room_name}</div>
+                                <div><strong>Type:</strong> {selectedPlan.exam_type}</div>
+                                <div><strong>Duration:</strong> {selectedPlan.duration_minutes} minutes</div>
+                                <div><strong>Description:</strong> {selectedPlan.description}</div>
                             </div>
                         </div>
 

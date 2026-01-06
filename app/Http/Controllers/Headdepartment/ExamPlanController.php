@@ -68,10 +68,10 @@ class ExamPlanController extends Controller
      */
     public function show($id)
     {
-        $examPlan = ExamPlan::with(['group', 'module', 'teacher', 'room', 'creator'])
+        $examPlan = ExamPlan::with(['group', 'module', 'teacher', 'room', 'creator', 'validator'])
             ->findOrFail($id);
 
-        return Inertia::render('Headdepartment/ExamPlans/Show', [
+        return Inertia::render('HeadDepartment/ExamPlanShow', [
             'examPlan' => [
                 'id' => $examPlan->id,
                 'group' => $examPlan->group,
@@ -90,8 +90,11 @@ class ExamPlanController extends Controller
                 'status' => $examPlan->status,
                 'status_label' => $examPlan->getStatusLabel(),
                 'status_color' => $examPlan->getStatusColor(),
-                'created_by' => $examPlan->creator,
+                'created_by' => $examPlan->creator ? $examPlan->creator->first_name . ' ' . $examPlan->creator->last_name : 'Unknown',
                 'created_at' => $examPlan->created_at->format('M d, Y H:i'),
+                'validator' => $examPlan->validator,
+                'validated_at' => $examPlan->validated_at ? $examPlan->validated_at->format('M d, Y H:i') : null,
+                'validation_notes' => $examPlan->validation_notes,
             ],
         ]);
     }
