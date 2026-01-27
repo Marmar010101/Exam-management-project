@@ -18,4 +18,9 @@ class Semester extends Model
     {
         return $this->hasMany(Group::class);
     }
+
+    public function modules()
+    {
+        return $this->hasMany(Module::class);
+    }
 }

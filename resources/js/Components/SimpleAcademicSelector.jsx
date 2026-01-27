@@ -6,132 +6,80 @@ const SimpleAcademicSelector = ({
     selectedSpeciality, 
     onSystemChange, 
     onLevelChange, 
-    onSpecialityChange 
+    onSpecialityChange,
+    showFrenchLabels = false,
+    cycles = [],
+    levels = [],
+    specialities = [],
+    semesters = []
 }) => {
-    const [systems, setSystems] = useState([]);
-    const [levels, setLevels] = useState([]);
-    const [specialities, setSpecialities] = useState([]);
+    const [filteredLevels, setFilteredLevels] = useState([]);
+    const [filteredSpecialities, setFilteredSpecialities] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // Charger les niveaux et spécialités au montage pour affichage immédiat
-    useEffect(() => {
-        const loadInitialData = async () => {
-            try {
-                // Charger tous les systèmes
-                const systemsResponse = await fetch('/api/academic/structure');
-                const systemsData = await systemsResponse.json();
-                setSystems(systemsData || []);
-                
-                // Charger tous les niveaux disponibles
-                const levelsResponse = await fetch('/api/academic/levels/all');
-                if (levelsResponse.ok) {
-                    const levelsData = await levelsResponse.json();
-                    setLevels(levelsData || []);
-                }
-                
-                // Charger toutes les spécialités disponibles
-                const specialitiesResponse = await fetch('/api/academic/specialities/all');
-                if (specialitiesResponse.ok) {
-                    const specialitiesData = await specialitiesResponse.json();
-                    setSpecialities(specialitiesData || []);
-                }
-            } catch (err) {
-                console.error('Error loading initial data:', err);
-                setSystems([]);
-                setLevels([]);
-                setSpecialities([]);
-            }
-        };
-        loadInitialData();
-    }, []);
-
-    // Charger les niveaux quand le système change
+    // Filter levels when system changes
     useEffect(() => {
         if (selectedSystem) {
-            const loadLevels = async () => {
-                try {
-                    setLoading(true);
-                    const response = await fetch(`/api/academic/system/${selectedSystem}/levels`);
-                    const data = await response.json();
-                    setLevels(data || []);
-                    setSpecialities([]); // Réinitialiser les spécialités
-                } catch (err) {
-                    console.error('Error loading levels:', err);
-                    setLevels([]);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            loadLevels();
+            const systemLevels = levels.filter(level => level.cycle_id == selectedSystem);
+            setFilteredLevels(systemLevels);
+            setFilteredSpecialities([]); // Reset specialities
         } else {
-            setLevels([]);
-            setSpecialities([]);
+            setFilteredLevels(levels);
+            setFilteredSpecialities(specialities);
         }
-    }, [selectedSystem]);
+    }, [selectedSystem, levels]);
 
-    // Charger les spécialités quand le niveau change
+    // Filter specialities when level changes
     useEffect(() => {
         if (selectedLevel) {
-            const loadSpecialities = async () => {
-                try {
-                    setLoading(true);
-                    const response = await fetch(`/api/academic/level/${selectedLevel}/specialities`);
-                    const data = await response.json();
-                    setSpecialities(data || []);
-                } catch (err) {
-                    console.error('Error loading specialities:', err);
-                    setSpecialities([]);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            loadSpecialities();
+            // For now, show all specialities for any level
+            setFilteredSpecialities(specialities);
         } else {
-            setSpecialities([]);
+            setFilteredSpecialities([]);
         }
-    }, [selectedLevel]);
+    }, [selectedLevel, specialities]);
 
     return (
         <div className="space-y-4">
-            {/* Système */}
+            {/* System */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Système de Formation
+                    {showFrenchLabels ? 'Système de Formation' : 'Training System'}
                 </label>
                 <select
                     value={selectedSystem}
                     onChange={(e) => {
                         onSystemChange(e.target.value);
-                        onLevelChange(''); // Réinitialiser le niveau
-                        onSpecialityChange(''); // Réinitialiser la spécialité
+                        onLevelChange(''); // Reset level
+                        onSpecialityChange(''); // Reset speciality
                     }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                    <option value="">Sélectionner un système</option>
-                    {systems.map((system) => (
+                    <option value="">{showFrenchLabels ? 'Sélectionner un système' : 'Select a system'}</option>
+                    {cycles.map((system) => (
                         <option key={system.id} value={system.id}>
-                            {system.name}
+                            {system.cycle_name}
                         </option>
                     ))}
                 </select>
             </div>
 
-            {/* Niveau */}
+            {/* Level */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Niveau
+                    {showFrenchLabels ? 'Niveau' : 'Level'}
                 </label>
                 <select
                     value={selectedLevel}
                     onChange={(e) => {
                         onLevelChange(e.target.value);
-                        onSpecialityChange(''); // Réinitialiser la spécialité
+                        onSpecialityChange(''); // Reset speciality
                     }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     disabled={!selectedSystem || loading}
                 >
-                    <option value="">Sélectionner un niveau</option>
-                    {levels.map((level) => (
+                    <option value="">{showFrenchLabels ? 'Sélectionner un niveau' : 'Select a level'}</option>
+                    {filteredLevels.map((level) => (
                         <option key={level.id} value={level.id}>
                             {level.name}
                         </option>
@@ -139,10 +87,10 @@ const SimpleAcademicSelector = ({
                 </select>
             </div>
 
-            {/* Spécialité */}
+            {/* Speciality */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Spécialité
+                    {showFrenchLabels ? 'Spécialité' : 'Speciality'}
                 </label>
                 <select
                     value={selectedSpeciality}
@@ -150,8 +98,8 @@ const SimpleAcademicSelector = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     disabled={!selectedLevel || loading}
                 >
-                    <option value="">Sélectionner une spécialité</option>
-                    {specialities.map((speciality) => (
+                    <option value="">{showFrenchLabels ? 'Sélectionner une spécialité' : 'Select a speciality'}</option>
+                    {filteredSpecialities.map((speciality) => (
                         <option key={speciality.id} value={speciality.id}>
                             {speciality.name}
                         </option>
@@ -159,10 +107,10 @@ const SimpleAcademicSelector = ({
                 </select>
             </div>
 
-            {/* Indicateur de chargement */}
+            {/* Loading indicator */}
             {loading && (
                 <div className="text-sm text-gray-500">
-                    Chargement...
+                    {showFrenchLabels ? 'Chargement...' : 'Loading...'}
                 </div>
             )}
         </div>

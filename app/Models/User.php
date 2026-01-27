@@ -11,7 +11,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'matricule','email','password','role','active'];
+    protected $fillable = ['name', 'first_name', 'last_name', 'matricule','email','password','role','active'];
 
     protected $hidden = [
         'password',
@@ -25,6 +25,11 @@ class User extends Authenticatable
     public function responsable()
     {
         return $this->hasOne(Responsable::class);
+    }
+
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class);
     }
 
     public function students()
@@ -42,8 +47,18 @@ class User extends Authenticatable
         return $this->hasOne(HeadDepartment::class);
     }
 
+    public function absences()
+    {
+        return $this->hasMany(TeacherAbsence::class, 'teacher_id');
+    }
+
     public function isRole($role)
     {
         return $this->role === $role;
+    }
+
+    public function username()
+    {
+        return 'matricule';
     }
 }

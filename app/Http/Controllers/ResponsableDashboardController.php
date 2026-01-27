@@ -36,10 +36,10 @@ class ResponsableDashboardController extends Controller
         $activePercentage = 85; // Active accounts percentage
 
         // Get upcoming exams
-        $upcomingExams = Exam::where('exame_date', '>=', now())
+        $upcomingExams = Exam::where('exam_date_old', '>=', now())
             ->with(['module', 'group'])
-            ->orderBy('exame_date')
-            ->orderBy('exame_time')
+            ->orderBy('exam_date_old')
+            ->orderBy('exam_time_old')
             ->limit(10)
             ->get()
             ->map(function ($exam) {
@@ -47,9 +47,9 @@ class ResponsableDashboardController extends Controller
                     'id' => $exam->id,
                     'module_name' => $exam->module ? $exam->module->module_name : 'Unknown',
                     'group_name' => $exam->group ? $exam->group->name : 'Unknown',
-                    'exam_date' => $exam->exame_date,
-                    'formatted_date' => \Carbon\Carbon::parse($exam->exame_date)->format('M d, Y'),
-                    'exam_time' => $exam->exame_time,
+                    'exam_date' => $exam->exam_date_old,
+                    'formatted_date' => \Carbon\Carbon::parse($exam->exam_date_old)->format('M d, Y'),
+                    'exam_time' => $exam->exam_time_old,
                     'type' => $exam->exam_type,
                 ];
             });

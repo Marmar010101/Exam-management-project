@@ -18,9 +18,11 @@ class ResponsableSeeder extends Seeder
     {
        $user = User::create([
             'matricule' => 'RES001',
-            'password'  => bcrypt('123456'), 
+            'password'  => bcrypt('password123'), 
             'email' => 'meriem0403arb@gmail.com',
             'role'      => 'responsable',
+            'first_name' => 'Ahmed',
+            'last_name'  => 'Bouzid',
         ]);
 
 

@@ -13,6 +13,19 @@ window.axios = axios;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 /**
+ * Ziggy - Route helper for Laravel
+ */
+// Check if Ziggy is available globally (injected by Laravel)
+if (typeof window.Ziggy !== 'undefined') {
+    import('ziggy-js').then(({ route }) => {
+        window.route = (name, params, absolute) => route(name, params, absolute, window.Ziggy);
+    });
+} else {
+    console.warn('Ziggy routes not available');
+    window.route = function() { return '#'; };
+}
+
+/**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting
  * allows your team to easily build robust real-time web applications.

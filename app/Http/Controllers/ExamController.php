@@ -17,15 +17,15 @@ class ExamController extends Controller
     {
         // Utiliser les vraies données des seeders
         $exams = Exam::with(['module', 'group', 'teacher'])
-            ->orderBy('exame_date', 'desc')
-            ->orderBy('exame_time', 'desc')
+            ->orderBy('exam_date_old', 'desc')
+            ->orderBy('exam_time_old', 'desc')
             ->get()
             ->map(function ($exam) {
                 return [
                     'id' => $exam->id,
                     'module' => $exam->module->module_name ?? 'Unknown',
-                    'date' => $exam->exame_date,
-                    'time' => $exam->exame_time,
+                    'date' => $exam->exam_date_old,
+                    'time' => $exam->exam_time_old,
                     'room' => 'A101', // Default room - could be enhanced
                     'type' => $exam->exam_type,
                     'duration' => 120, // Default duration

@@ -60,6 +60,6 @@ class Group extends Model
 
     public function exams()
     {
-        return $this->hasMany(Exam::class, 'id_group');
+        return $this->hasMany(Exam::class, 'group_id');
     }
 }

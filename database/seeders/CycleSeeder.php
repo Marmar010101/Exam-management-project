@@ -17,6 +17,7 @@ class CycleSeeder extends Seeder
         $cycles = [
     ['cycle_name' => 'Licence', 'cycle_type' => 'LMD'],
     ['cycle_name' => 'Master', 'cycle_type' => 'LMD'],
+    ['cycle_name' => 'Engineer_Tronc_commun', 'cycle_type' => 'ING'],
     ['cycle_name' => 'Engineer', 'cycle_type' => 'ING'],
 ];
 foreach($cycles as $c) Cycle::create($c);

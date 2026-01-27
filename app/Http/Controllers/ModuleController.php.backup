@@ -1,0 +1,124 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Module;
+use App\Models\Speciality;
+use App\Models\Level;
+use App\Models\Semester;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
+
+class ModuleControllerFixed extends Controller
+{
+    /**
+     * Display a listing of the modules.
+     */
+    public function index()
+    {
+        // Debug: Vérifier les données
+        \Log::info('Specialities count: ' . Speciality::count());
+        \Log::info('Levels count: ' . Level::count());
+        \Log::info('Semesters count: ' . Semester::count());
+        \Log::info('Cycles count: ' . \App\Models\Cycle::count());
+        
+        // Utiliser DB::query pour éviter les problèmes de relations Eloquent
+        $modules = DB::table('modules')
+            ->leftJoin('specialities', 'modules.speciality_id', '=', 'specialities.id')
+            ->leftJoin('levels', 'modules.level_id', '=', 'levels.id')
+            ->leftJoin('semesters', 'modules.semester_id', '=', 'semesters.id')
+            ->leftJoin('cycles', 'levels.cycle_id', '=', 'cycles.id')
+            ->leftJoin('teachers', 'modules.teacher_id', '=', 'teachers.id')
+            ->select([
+                'modules.id',
+                'modules.module_name',
+                'modules.code',
+                'modules.speciality_id',
+                'modules.level_id',
+                'modules.semester_id',
+                'modules.credits',
+                'modules.volume_cm',
+                'modules.volume_td',
+                'modules.teacher_id',
+                'specialities.name as speciality_name',
+                'levels.name as level_name',
+                'semesters.name as semester_name',
+                'cycles.cycle_name as cycle_name',
+                'teachers.first_name as teacher_first_name',
+                'teachers.last_name as teacher_last_name'
+            ])
+            ->get();
+
+        $specialities = Speciality::all(['id', 'name']);
+        $levels = Level::with('cycle')->get(['id', 'name', 'cycle_id']);
+        $semesters = Semester::all(['id', 'name', 'level_id']);
+        $cycles = \App\Models\Cycle::all(['id', 'cycle_name']);
+
+        // Debug: Vérifier les collections
+        \Log::info('Specialities collection: ' . $specialities->count());
+        \Log::info('Levels collection: ' . $levels->count());
+        \Log::info('Semesters collection: ' . $semesters->count());
+        \Log::info('Cycles collection: ' . $cycles->count());
+
+        return Inertia::render('HeadDepartment/modules', [
+            'modules' => $modules,
+            'specialities' => $specialities,
+            'levels' => $levels,
+            'semesters' => $semesters,
+            'cycles' => $cycles
+        ]);
+    }
+
+    /**
+     * Store a newly created module.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'module_name' => 'required|string|max:255',
+            'code' => 'required|string|max:50|unique:modules,code',
+            'speciality_id' => 'required|exists:specialities,id',
+            'level_id' => 'required|exists:levels,id',
+            'semester_id' => 'required|exists:semesters,id',
+            'credits' => 'required|integer|min:1|max:7',
+            'volume_cm' => 'nullable|integer|min:0|max:60',
+            'volume_td' => 'nullable|integer|min:0|max:60'
+        ]);
+
+        Module::create($validated);
+
+        return redirect()->back()->with('success', 'Module created successfully');
+    }
+
+    /**
+     * Update the specified module.
+     */
+    public function update(Request $request, Module $module)
+    {
+        $validated = $request->validate([
+            'module_name' => 'required|string|max:255',
+            'code' => 'required|string|max:50|unique:modules,code,' . $module->id,
+            'speciality_id' => 'required|exists:specialities,id',
+            'level_id' => 'required|exists:levels,id',
+            'semester_id' => 'required|exists:semesters,id',
+            'credits' => 'required|integer|min:1|max:7',
+            'volume_cm' => 'nullable|integer|min:0|max:60',
+            'volume_td' => 'nullable|integer|min:0|max:60'
+        ]);
+
+        $module->update($validated);
+
+        return redirect()->back()->with('success', 'Module updated successfully');
+    }
+
+    /**
+     * Remove the specified module.
+     */
+    public function destroy(Module $module)
+    {
+        $module->delete();
+
+        return redirect()->back()->with('success', 'Module deleted successfully');
+    }
+}

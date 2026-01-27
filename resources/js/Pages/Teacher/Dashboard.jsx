@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { 
     BookOpen, 
@@ -17,6 +17,8 @@ export default function TeacherDashboard({
     recentAlerts = [],
     upcomingExams = []
 }) {
+    const { auth } = usePage().props;
+    const user = auth.user;
     // Mock data for demonstration
     const mockStats = {
         totalModules: 4,
@@ -29,23 +31,23 @@ export default function TeacherDashboard({
         {
             id: 1,
             type: 'warning',
-            title: 'Surveillance demain',
-            message: 'Examen de Database Systems - Salle A101 - 08:00',
-            time: 'Il y a 2 heures'
+            title: 'Surveillance tomorrow',
+            message: 'Database Systems exam - Room A101 - 08:00',
+            time: '2 hours ago'
         },
         {
             id: 2,
             type: 'info',
-            title: 'Changement de salle',
-            message: 'Examen Algorithms déplacé vers B201',
-            time: 'Il y a 5 heures'
+            title: 'Room change',
+            message: 'Algorithms exam moved to B201',
+            time: '5 hours ago'
         },
         {
             id: 3,
             type: 'success',
-            title: 'Demande approuvée',
-            message: 'Votre demande d\'absence a été acceptée',
-            time: 'Hier'
+            title: 'Request approved',
+            message: 'Your absence request has been accepted',
+            time: 'Yesterday'
         }
     ];
 
@@ -53,7 +55,7 @@ export default function TeacherDashboard({
         {
             id: 1,
             module: 'Database Systems',
-            date: '15 Janvier 2025',
+            date: 'January 15, 2025',
             time: '08:00 - 10:00',
             room: 'A101',
             group: 'CS2A',
@@ -62,7 +64,7 @@ export default function TeacherDashboard({
         {
             id: 2,
             module: 'Web Development',
-            date: '17 Janvier 2025',
+            date: 'January 17, 2025',
             time: '14:00 - 16:00',
             room: 'B201',
             group: 'CS2B',
@@ -71,7 +73,7 @@ export default function TeacherDashboard({
         {
             id: 3,
             module: 'Algorithms',
-            date: '20 Janvier 2025',
+            date: 'January 20, 2025',
             time: '10:00 - 12:00',
             room: 'C301',
             group: 'CS2A',
@@ -109,53 +111,64 @@ export default function TeacherDashboard({
         <AuthenticatedLayout header="Teacher Dashboard">
             <Head title="Teacher Dashboard" />
             
-            <div className="max-w-7xl mx-auto space-y-6">
-                {/* Statistics Cards - Read Only */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="py-6">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    {/* Welcome message */}
+                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 mb-8 text-white">
+                        <h1 className="text-2xl font-bold mb-2">
+                            Welcome, {user?.first_name || 'Teacher'}!
+                        </h1>
+                        <p className="text-orange-100">
+                            Here's your teaching dashboard with modules, exams, and notifications
+                        </p>
+                    </div>
+
+                    {/* Statistics Cards - Read Only */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                         <div className="flex items-center">
-                            <div className="p-3 bg-blue-100 rounded-lg">
+                            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
                                 <BookOpen className="text-blue-600" size={24} />
                             </div>
                             <div className="ml-4">
-                                <h3 className="text-lg font-semibold text-gray-900">{mockStats.totalModules}</h3>
-                                <p className="text-sm text-gray-600">Modules assignés</p>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{mockStats.totalModules}</h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">Assigned Modules</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                         <div className="flex items-center">
-                            <div className="p-3 bg-purple-100 rounded-lg">
+                            <div className="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
                                 <Eye className="text-purple-600" size={24} />
                             </div>
                             <div className="ml-4">
-                                <h3 className="text-lg font-semibold text-gray-900">{mockStats.totalSurveillances}</h3>
-                                <p className="text-sm text-gray-600">Examens à surveiller</p>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{mockStats.totalSurveillances}</h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">Exams to Monitor</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                         <div className="flex items-center">
-                            <div className="p-3 bg-orange-100 rounded-lg">
+                            <div className="p-3 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
                                 <Calendar className="text-orange-600" size={24} />
                             </div>
                             <div className="ml-4">
-                                <h3 className="text-lg font-semibold text-gray-900">{mockStats.upcomingExams}</h3>
-                                <p className="text-sm text-gray-600">Examens à venir</p>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{mockStats.upcomingExams}</h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">Upcoming Exams</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                         <div className="flex items-center">
-                            <div className="p-3 bg-green-100 rounded-lg">
+                            <div className="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
                                 <Users className="text-green-600" size={24} />
                             </div>
                             <div className="ml-4">
-                                <h3 className="text-lg font-semibold text-gray-900">{mockStats.attendanceRate}%</h3>
-                                <p className="text-sm text-gray-600">Taux de présence</p>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{mockStats.attendanceRate}%</h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">Attendance Rate</p>
                             </div>
                         </div>
                     </div>
@@ -164,8 +177,8 @@ export default function TeacherDashboard({
                 {/* Main Content Area */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Recent Alerts */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Alertes récentes</h3>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Alerts</h3>
                         <div className="space-y-3">
                             {mockRecentAlerts.map(alert => (
                                 <div 
@@ -177,9 +190,9 @@ export default function TeacherDashboard({
                                             {getAlertIcon(alert.type)}
                                         </div>
                                         <div className="flex-1">
-                                            <div className="font-medium text-gray-900">{alert.title}</div>
-                                            <div className="text-sm text-gray-600 mt-1">{alert.message}</div>
-                                            <div className="text-xs text-gray-500 mt-2">{alert.time}</div>
+                                            <div className="font-medium text-gray-900 dark:text-white">{alert.title}</div>
+                                            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">{alert.message}</div>
+                                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">{alert.time}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -188,19 +201,19 @@ export default function TeacherDashboard({
                     </div>
 
                     {/* Upcoming Exams */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Prochains examens</h3>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Upcoming Exams</h3>
                         <div className="space-y-3">
                             {mockUpcomingExams.map(exam => (
-                                <div key={exam.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <div key={exam.id} className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <div className="font-medium text-gray-900">{exam.module}</div>
-                                            <div className="text-sm text-gray-600 mt-1">
+                                            <div className="font-medium text-gray-900 dark:text-white">{exam.module}</div>
+                                            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                                 {exam.date} • {exam.time}
                                             </div>
-                                            <div className="text-sm text-gray-500 mt-1">
-                                                Salle {exam.room} • Groupe {exam.group}
+                                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                                Room {exam.room} • Group {exam.group}
                                             </div>
                                         </div>
                                         <div className="text-right">
@@ -220,17 +233,18 @@ export default function TeacherDashboard({
                 </div>
 
                 {/* Info Section */}
-                <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800 p-6">
                     <div className="flex items-start">
                         <Info className="text-blue-600 mr-3 mt-1" size={20} />
                         <div>
-                            <h4 className="font-medium text-blue-900 mb-2">Espace consultatif</h4>
-                            <p className="text-sm text-blue-800">
-                                Dans cet espace, vous pouvez consulter toutes les informations relatives à vos modules et surveillances. 
-                                Pour toute modification ou demande, utilisez les pages dédiées dans le menu.
+                            <h4 className="font-medium text-blue-900 dark:text-white mb-2">Consultation Space</h4>
+                            <p className="text-sm text-blue-800 dark:text-blue-200">
+                                In this space, you can view all information related to your modules and supervisions. 
+                                For any modifications or requests, use the dedicated pages in the menu.
                             </p>
                         </div>
                     </div>
+                </div>
                 </div>
             </div>
         </AuthenticatedLayout>

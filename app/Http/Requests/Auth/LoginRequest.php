@@ -41,9 +41,19 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('matricule', 'password'), $this->boolean('remember'))) {
+        // Trouver l'utilisateur par matricule
+        $user = \App\Models\User::where('matricule', $this->matricule)->first();
+        
+        if (!$user) {
             RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'matricule' => trans('auth.failed'),
+            ]);
+        }
 
+        // Utiliser l'email de l'utilisateur pour l'authentification Laravel
+        if (! Auth::attempt(['email' => $user->email, 'password' => $this->password], $this->boolean('remember'))) {
+            RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'matricule' => trans('auth.failed'),
             ]);

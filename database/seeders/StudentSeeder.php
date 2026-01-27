@@ -21,31 +21,35 @@ class StudentSeeder extends Seeder
    
     { $students = [
             [
-                'matricule' => '202537016701',
+                'matricule' => 'STU001',
                 'first_name' => 'Mourad',
                 'last_name' => 'Almi',
-                'password' => 'Mourad123', 
+                'email' => 'mourad.almi@university.edu',
+                'password' => 'password123', 
                 'group' => 'G1'
             ],
             [
-                'matricule' => '202537016702',
+                'matricule' => 'STU002',
                 'first_name' => 'Sara',
                 'last_name' => 'Farah',
-                'password' => 'Sara123',
+                'email' => 'sara.farah@university.edu',
+                'password' => 'password123',
                 'group' => 'G2'
             ],
             [
-                'matricule' => '202537016703',
+                'matricule' => 'STU003',
                 'first_name' => 'Ali',
                 'last_name' => 'Benkhelifa',
-                'password' => 'Ali123',
+                'email' => 'ali.benkhelifa@university.edu',
+                'password' => 'password123',
                 'group' => 'G1'
             ],
             [
-                'matricule' => '202537016704',
-                'first_name' => 'Arvaoui',
-                'last_name' => 'Meriem',
-                'password' => 'Meriem123',
+                'matricule' => 'STU004',
+                'first_name' => 'Meriem',
+                'last_name' => 'Arvaoui',
+                'email' => 'meriem.arvaoui@university.edu',
+                'password' => 'password123',
                 'group' => 'G1'
             ],
         ];
@@ -54,8 +58,11 @@ class StudentSeeder extends Seeder
             
             $user = User::create([
                 'matricule' => $s['matricule'],
+                'email' => $s['email'],
                 'password'  => bcrypt($s['password']),
                 'role'      => 'student',
+                'first_name' => $s['first_name'],
+                'last_name' => $s['last_name'],
             ]);
 
             $group = Group::where('name', 'like', '%' . $s['group'] . '%')->first();

@@ -25,6 +25,9 @@ class TeacherRequest extends Model
         'status',
         'admin_notes',
         'response_date',
+        'justification_file',
+        'processed_at',
+        'created_at'
     ];
 
     protected $casts = [
@@ -33,11 +36,11 @@ class TeacherRequest extends Model
     ];
 
     /**
-     * Get the teacher that owns the request.
+     * Get the user that owns the request.
      */
-    public function teacher(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Teacher::class);
+        return $this->belongsTo(User::class);
     }
 
     /**

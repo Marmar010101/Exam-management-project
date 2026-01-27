@@ -62,19 +62,32 @@ export default function Management() {
     const handleSubmit = (e) => {
         e.preventDefault();
         
+        const submitData = {
+            ...formData,
+        };
+        
+        console.log('Submitting user data:', submitData);
+        
         if (editingUser) {
-            router.put(route('users.update', editingUser.id), formData, {
+            router.put(`/HeadDepartment/AccountManagement/Management/${editingUser.id}`, submitData, {
                 onSuccess: () => {
                     setShowModal(false);
                     setEditingUser(null);
                     resetForm();
+                },
+                onError: (errors) => {
+                    console.error('Update errors:', errors);
                 }
             });
         } else {
-            router.post(route('users.store'), formData, {
+            console.log('Creating user with data:', submitData);
+            router.post(route('headdepartment.management.store'), submitData, {
                 onSuccess: () => {
                     setShowModal(false);
                     resetForm();
+                },
+                onError: (errors) => {
+                    console.error('Create errors:', errors);
                 }
             });
         }
@@ -100,7 +113,14 @@ export default function Management() {
         }
         
         if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
-            router.delete(route('users.destroy', user.id));
+            router.delete(`/HeadDepartment/AccountManagement/Management/${user.id}`, {
+                onSuccess: () => {
+                    // La redirection est automatique avec Inertia
+                },
+                onError: (errors) => {
+                    console.error('Errors:', errors);
+                }
+            });
         }
     };
 

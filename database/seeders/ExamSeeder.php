@@ -2,164 +2,194 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Exam;
-use App\Models\User;
-use App\Models\Group;
 use App\Models\Module;
-use App\Models\Teacher;
 use App\Models\Room;
+use Illuminate\Database\Seeder;
 
 class ExamSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        // Get users for responsible and headdepartment
-        $responsable = User::where('role', 'responsable')->first();
-        $headdepartment = User::where('role', 'headdepartment')->first();
-
-        if (!$responsable || !$headdepartment) {
-            $this->command->error('No responsible or headdepartment users found. Please run UserDataSeeder first.');
-            return;
-        }
-
-        // Get sample data
-        $groups = Group::with(['level', 'speciality'])->get();
+        // Vider les examens existants
+        Exam::query()->delete();
+        
+        // Récupérer tous les modules et salles
         $modules = Module::all();
-        $teachers = Teacher::all();
         $rooms = Room::all();
-
-        // Check if we have enough data
-        if ($groups->count() < 3 || $modules->count() < 3 || $teachers->count() < 3 || $rooms->count() < 3) {
-            $this->command->error('Insufficient data for exams seeding. Please ensure you have at least 3 groups, modules, teachers, and rooms.');
+        
+        if ($modules->count() === 0) {
+            $this->command->error('Aucun module trouvé. Veuillez d\'abord exécuter le ModuleSeeder.');
             return;
         }
-
-        // Create comprehensive exams with different statuses
-        $exams = [
-            // Pending exams (waiting for validation)
-            [
-                'exam_type' => 'Examen',
-                'exame_date' => now()->addDays(8)->format('Y-m-d'),
-                'exame_time' => now()->setTime(9, 0)->format('Y-m-d H:i:s'),
-                'teacher_id' => $teachers->first()->id,
-                'id_group' => $groups->first()->id,
-                'id_module' => $modules->first()->id,
-                'room_id' => $rooms->first()->id,
-                'duration' => 120,
-                'status' => 'pending',
-                'created_by' => $responsable->id,
-                'validated_by' => null,
-                'validation_notes' => null,
-                'validated_at' => null,
-            ],
-            [
-                'exam_type' => 'Contrôle',
-                'exame_date' => now()->addDays(10)->format('Y-m-d'),
-                'exame_time' => now()->setTime(14, 0)->format('Y-m-d H:i:s'),
-                'teacher_id' => $teachers->skip(1)->first()->id,
-                'id_group' => $groups->skip(1)->first()->id,
-                'id_module' => $modules->skip(1)->first()->id,
-                'room_id' => $rooms->skip(1)->first()->id,
-                'duration' => 90,
-                'status' => 'pending',
-                'created_by' => $responsable->id,
-                'validated_by' => null,
-                'validation_notes' => null,
-                'validated_at' => null,
-            ],
-
-            // Validated exams (approved by headdepartment)
-            [
-                'exam_type' => 'Rattrapage',
-                'exame_date' => now()->addDays(12)->format('Y-m-d'),
-                'exame_time' => now()->setTime(10, 0)->format('Y-m-d H:i:s'),
-                'teacher_id' => $teachers->skip(2)->first()->id,
-                'id_group' => $groups->skip(2)->first()->id,
-                'id_module' => $modules->skip(2)->first()->id,
-                'room_id' => $rooms->skip(2)->first()->id,
-                'duration' => 150,
-                'status' => 'validated',
-                'created_by' => $responsable->id,
-                'validated_by' => $headdepartment->id,
-                'validation_notes' => 'Approved schedule and room allocation',
-                'validated_at' => now()->subDays(1),
-            ],
-            [
-                'exam_type' => 'Examen',
-                'exame_date' => now()->addDays(15)->format('Y-m-d'),
-                'exame_time' => now()->setTime(9, 0)->format('Y-m-d H:i:s'),
-                'teacher_id' => $teachers->first()->id,
-                'id_group' => $groups->first()->id,
-                'id_module' => $modules->skip(1)->first()->id,
-                'room_id' => $rooms->first()->id,
-                'duration' => 180,
-                'status' => 'validated',
-                'created_by' => $responsable->id,
-                'validated_by' => $headdepartment->id,
-                'validation_notes' => 'Schedule confirmed. All resources available.',
-                'validated_at' => now()->subHours(6),
-            ],
-
-            // Rejected exams (rejected by headdepartment)
-            [
-                'exam_type' => 'Contrôle',
-                'exame_date' => now()->addDays(14)->format('Y-m-d'),
-                'exame_time' => now()->setTime(15, 0)->format('Y-m-d H:i:s'),
-                'teacher_id' => $teachers->skip(1)->first()->id,
-                'id_group' => $groups->skip(1)->first()->id,
-                'id_module' => $modules->skip(2)->first()->id,
-                'room_id' => $rooms->skip(1)->first()->id,
-                'duration' => 60,
-                'status' => 'rejected',
-                'created_by' => $responsable->id,
-                'validated_by' => $headdepartment->id,
-                'validation_notes' => 'Room conflict with another exam. Please reschedule.',
-                'validated_at' => now()->subHours(12),
-            ],
-
-            // Scheduled exams (fully scheduled and confirmed)
-            [
-                'exam_type' => 'Examen',
-                'exame_date' => now()->addDays(20)->format('Y-m-d'),
-                'exame_time' => now()->setTime(14, 0)->format('Y-m-d H:i:s'),
-                'teacher_id' => $teachers->skip(2)->first()->id,
-                'id_group' => $groups->skip(2)->first()->id,
-                'id_module' => $modules->first()->id,
-                'room_id' => $rooms->skip(2)->first()->id,
-                'duration' => 120,
-                'status' => 'scheduled',
-                'created_by' => $responsable->id,
-                'validated_by' => $headdepartment->id,
-                'validation_notes' => 'Approved and scheduled. All logistics confirmed.',
-                'validated_at' => now()->subDays(2),
-            ],
-            [
-                'exam_type' => 'Rattrapage',
-                'exame_date' => now()->addDays(25)->format('Y-m-d'),
-                'exame_time' => now()->setTime(10, 0)->format('Y-m-d H:i:s'),
-                'teacher_id' => $teachers->first()->id,
-                'id_group' => $groups->first()->id,
-                'id_module' => $modules->skip(2)->first()->id,
-                'room_id' => $rooms->first()->id,
-                'duration' => 180,
-                'status' => 'scheduled',
-                'created_by' => $responsable->id,
-                'validated_by' => $headdepartment->id,
-                'validation_notes' => 'Schedule confirmed. Room and time allocated.',
-                'validated_at' => now()->subDays(1),
-            ],
-        ];
-
-        foreach ($exams as $exam) {
-            Exam::create($exam);
+        
+        if ($rooms->count() === 0) {
+            $this->command->error('Aucune salle trouvée.');
+            return;
         }
-
-        $this->command->info('Exams seeded successfully!');
-        $this->command->info('Created ' . count($exams) . ' exams with different statuses:');
-        $this->command->info('- Pending: ' . Exam::where('status', 'pending')->count() . ' (waiting for validation)');
-        $this->command->info('- Validated: ' . Exam::where('status', 'validated')->count() . ' (approved by headdepartment)');
-        $this->command->info('- Rejected: ' . Exam::where('status', 'rejected')->count() . ' (rejected by headdepartment)');
-        $this->command->info('- Scheduled: ' . Exam::where('status', 'scheduled')->count() . ' (fully scheduled)');
+        
+        $exams = [];
+        $examTypes = ['Normal', 'Replacement', 'Retake']; // Types pour Exam
+        $controlTypes = ['Normal', 'Replacement']; // Types pour Control
+        $testTypes = ['Test']; // Type pour Test_TP
+        
+        // Dates d'examens pour janvier 2026
+        $examDates = [
+            '2026-01-15', '2026-01-16', '2026-01-17', '2026-01-18', '2026-01-19', '2026-01-20', '2026-01-21', '2026-01-22',
+            '2026-01-23', '2026-01-24', '2026-01-25', '2026-01-26', '2026-01-27', '2026-01-28', '2026-01-29', '2026-01-30',
+            '2026-01-31'
+        ];
+        
+        // Créneaux horaires
+        $timeSlots = ['08:30:00', '10:45:00', '13:00:00', '15:15:00', '17:30:00'];
+        
+        $examIndex = 0;
+        
+        // Pour chaque module, créer des examens pour chaque type
+        foreach ($modules as $module) {
+            // Exam types
+            foreach ($examTypes as $type) {
+                $exam = $this->createExam($module, $type, $examDates, $timeSlots, $rooms, $examIndex);
+                $exams[] = $exam;
+                $examIndex++;
+            }
+            
+            // Control types
+            foreach ($controlTypes as $type) {
+                $exam = $this->createExam($module, $type, $examDates, $timeSlots, $rooms, $examIndex);
+                $exams[] = $exam;
+                $examIndex++;
+            }
+            
+            // Test_TP types
+            foreach ($testTypes as $type) {
+                $exam = $this->createExam($module, $type, $examDates, $timeSlots, $rooms, $examIndex);
+                $exams[] = $exam;
+                $examIndex++;
+            }
+        }
+        
+        // Insérer tous les examens un par un pour éviter les erreurs
+        $successCount = 0;
+        $errorCount = 0;
+        
+        foreach ($exams as $examData) {
+            try {
+                Exam::create($examData);
+                $successCount++;
+            } catch (\Exception $e) {
+                $errorCount++;
+                $this->command->error("Erreur pour l'examen: " . $e->getMessage());
+            }
+        }
+        
+        $this->command->info($successCount . ' examens créés avec succès pour ' . $modules->count() . ' modules.');
+        if ($errorCount > 0) {
+            $this->command->error($errorCount . ' examens ont échoué');
+        }
+        $this->command->info('Chaque module a des examens pour: Exam (3 types), Control (2 types), Test_TP (1 type)');
+        
+        // Afficher les détails
+        $this->displayExamDetails();
+    }
+    
+    private function createExam($module, $type, $examDates, $timeSlots, $rooms, $examIndex): array
+    {
+        // Calculer la date et l'heure
+        $dateIndex = $examIndex % count($examDates);
+        $timeIndex = ($examIndex % count($timeSlots));
+        $roomIndex = ($examIndex % $rooms->count());
+        
+        // Déterminer le type d'examen correct
+        $examType = match($type) {
+            'Normal', 'Replacement', 'Retake' => 'Exam',
+            'Test' => 'Test_TP',
+            default => 'Control'
+        };
+        
+        // Tous les examens sauf un seront acceptés
+        $status = ($examIndex === 0) ? 'pending' : 'accepted';
+        
+        return [
+            'module_id' => $module->id,  // Corrigé: module_id au lieu de id_module
+            'module_id_old' => $module->id,  // Ajouté: module_id_old
+            'group_id' => null,  // Ajouté: group_id peut être null
+            'group_id_old' => null,  // Ajouté: group_id_old
+            'title' => $examType . ' - ' . $module->module_name,  // Ajouté: title obligatoire
+            'exam_date_old' => $examDates[$dateIndex],  // Corrigé: exam_date_old
+            'exam_time_old' => $timeSlots[$timeIndex],  // Corrigé: exam_time_old
+            'room_id' => $rooms->get($roomIndex)->id,
+            'exam_type' => $examType,
+            'exam_subtype' => $type,  // Garder le sous-type original
+            'duration_minutes' => $this->getExamDuration($type),  // Corrigé: duration_minutes
+            'status' => $status,  // 'accepted' pour la plupart, 'pending' pour un seul
+            'created_by' => 40, // Responsable user ID
+            'validated_by' => ($status === 'accepted') ? 41 : null, // Head Department ID si accepté
+            'validated_at' => ($status === 'accepted') ? now() : null,
+            'validation_notes' => ($status === 'accepted') ? 'Validé automatiquement' : null,
+            'created_at' => now(),
+            'updated_at' => now()
+        ];
+    }
+    
+    private function getExamDuration($type): int
+    {
+        return match($type) {
+            'Normal' => 120,
+            'Replacement' => 90,
+            'Retake' => 120,
+            'Test' => 60,
+            default => 120
+        };
+    }
+    
+    private function displayExamDetails(): void
+    {
+        $this->command->info("\n=== DÉTAILS DES EXAMENS CRÉÉS ===\n");
+        
+        $modules = Module::all();
+        $examCount = 0;
+        $pendingCount = 0;
+        $acceptedCount = 0;
+        
+        foreach ($modules as $module) {
+            $moduleExams = Exam::where('module_id', $module->id)->get();  // Corrigé: module_id
+            
+            $this->command->info("Module: {$module->module_name} ({$module->code})");
+            
+            foreach ($moduleExams as $exam) {
+                $examCount++;
+                $room = $exam->room;
+                $statusIcon = $exam->status === 'accepted' ? '✅' : '⏳';
+                if ($exam->status === 'pending') $pendingCount++;
+                if ($exam->status === 'accepted') $acceptedCount++;
+                
+                $this->command->info(sprintf(
+                    "  %s - %s | %s | %s | %s | %d min | %s",
+                    $statusIcon,
+                    $exam->exam_type,
+                    $exam->exam_date_old,  // Corrigé: exam_date_old
+                    substr($exam->exam_time_old, 0, 5),  // Corrigé: exam_time_old
+                    $room ? $room->room_name : 'Unknown',
+                    $exam->duration_minutes,  // Corrigé: duration_minutes
+                    $exam->status
+                ));
+            }
+            
+            $this->command->info(""); // Ligne vide entre les modules
+        }
+        
+        $this->command->info("Total: {$examCount} examens créés");
+        $this->command->info("✅ Acceptés: {$acceptedCount} | ⏳ En attente: {$pendingCount}");
+        
+        // Statistiques par type
+        $examCount = Exam::where('exam_type', 'Exam')->count();
+        $controlCount = Exam::where('exam_type', 'Control')->count();
+        $testTPCount = Exam::where('exam_type', 'Test_TP')->count();
+        
+        $this->command->info("\nRépartition par type:");
+        $this->command->info("- Exam: {$examCount}");
+        $this->command->info("- Control: {$controlCount}");
+        $this->command->info("- Test_TP: {$testTPCount}");
     }
 }

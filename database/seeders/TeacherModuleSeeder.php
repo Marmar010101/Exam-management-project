@@ -4,39 +4,55 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class TeacherModuleSeeder extends Seeder
 {
     public function run()
     {
-        // Get teacher IDs from users table where role = 'teacher'
-        $teacherOmar = DB::table('users')->where('matricule', 'TCH001')->first();
-        $teacherLeila = DB::table('users')->where('matricule', 'TCH002')->first();
+        // Get first teacher user
+        $user = DB::table('users')->where('role', 'teacher')->first();
         
-        if (!$teacherOmar || !$teacherLeila) {
-            return; // Skip if teachers don't exist
-        }
-        
-        // Assigner des modules aux enseignants
-        $teacherModules = [
-            // Dr. Omar (teacher_id = 2)
-            ['teacher_id' => $teacherOmar->id, 'module_id' => 1], // Algorithmique
-            ['teacher_id' => $teacherOmar->id, 'module_id' => 2], // Bases de Données
-            ['teacher_id' => $teacherOmar->id, 'module_id' => 5], // Intelligence Artificielle
+        if ($user) {
+            // Create teacher record for this user if not exists
+            $teacherExists = DB::table('teachers')->where('id', $user->id)->exists();
             
-            // Dr. Leila (teacher_id = 3)
-            ['teacher_id' => $teacherLeila->id, 'module_id' => 3], // Réseaux
-            ['teacher_id' => $teacherLeila->id, 'module_id' => 4], // Programmation Web
-        ];
-
-        foreach ($teacherModules as $assignment) {
-            DB::table('teacher_modules')->insert([
-                'teacher_id' => $assignment['teacher_id'],
-                'module_id' => $assignment['module_id'],
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
+            if (!$teacherExists) {
+                DB::table('teachers')->insert([
+                    'id' => $user->id,
+                    'user_id' => $user->id,
+                    'first_name' => $user->first_name ?? 'Teacher',
+                    'last_name' => $user->last_name ?? 'User',
+                    'grade' => 'Professor',
+                    'is_responsable' => false,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+                echo "✅ Created teacher record for user ID: {$user->id}\n";
+            }
+            
+            // Assign modules to this teacher
+            $modules = DB::table('modules')->take(3)->get();
+            
+            foreach ($modules as $module) {
+                $exists = DB::table('module_teachers')
+                    ->where('module_id', $module->id)
+                    ->where('teacher_id', $user->id)
+                    ->exists();
+                
+                if (!$exists) {
+                    DB::table('module_teachers')->insert([
+                        'module_id' => $module->id,
+                        'teacher_id' => $user->id,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+                    echo "✅ Assigned module '{$module->module_name}' to teacher\n";
+                }
+            }
+            
+            echo "✅ Teacher module assignments completed!\n";
+        } else {
+            echo "❌ No teacher user found\n";
         }
     }
 }

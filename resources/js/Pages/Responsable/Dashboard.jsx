@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, usePage, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
     Users,
@@ -24,6 +24,8 @@ export default function Dashboard({
     groups = [],
     upcomingExams = []
 }) {
+    const { auth } = usePage().props;
+    const user = auth.user;
     const displayedGroups = groups.slice(0, 6);
 
     return (
@@ -31,6 +33,16 @@ export default function Dashboard({
             <Head title="Dashboard - Responsible" />
             
             <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                {/* Welcome message */}
+                <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 mb-8 text-white">
+                    <h1 className="text-2xl font-bold mb-2">
+                        Welcome, {user?.first_name || 'Responsable'}!
+                    </h1>
+                    <p className="text-green-100">
+                        Here's your academic management overview and coordination dashboard
+                    </p>
+                </div>
+
                 {/* Stats Overview */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
@@ -116,7 +128,7 @@ export default function Dashboard({
                                                 </div>
                                             </div>
                                             <Link
-                                                href={route('responsable.groups')}
+                                                href="/Responsable/GroupsIndex"
                                                 className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center"
                                             >
                                                 View Details
@@ -127,7 +139,7 @@ export default function Dashboard({
                                 </div>
                                 <div className="text-center mt-4">
                                     <Link
-                                        href={route('responsable.groups')}
+                                        href="/Responsable/GroupsIndex"
                                         className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
                                     >
                                         View All Groups
@@ -135,77 +147,6 @@ export default function Dashboard({
                                     </Link>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    {/* Quick Actions */}
-                    <div className="space-y-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <Link
-                                href={route('responsable.exams.create')}
-                                className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow group"
-                            >
-                                <div className="flex items-center">
-                                    <div className="flex-shrink-0 bg-blue-100 rounded-lg p-3 group-hover:bg-blue-200 transition-colors">
-                                        <Calendar className="h-6 w-6 text-blue-600" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <h3 className="text-lg font-medium text-gray-900">Schedule New Exam</h3>
-                                        <p className="text-sm text-gray-600">Create and manage exam schedules</p>
-                                    </div>
-                                </div>
-                                <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
-                            </Link>
-
-                            <Link
-                                href={route('responsable.planning.calendar')}
-                                className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow group"
-                            >
-                                <div className="flex items-center">
-                                    <div className="flex-shrink-0 bg-green-100 rounded-lg p-3 group-hover:bg-green-200 transition-colors">
-                                        <CalendarDays className="h-6 w-6 text-green-600" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <h3 className="text-lg font-medium text-gray-900">View Calendar</h3>
-                                        <p className="text-sm text-gray-600">Check exam schedules and availability</p>
-                                    </div>
-                                </div>
-                                <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-green-600 transition-colors" />
-                            </Link>
-
-                            <Link
-                                href={route('responsable.invigilation')}
-                                className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow group"
-                            >
-                                <div className="flex items-center">
-                                    <div className="flex-shrink-0 bg-purple-100 rounded-lg p-3 group-hover:bg-purple-200 transition-colors">
-                                        <Users className="h-6 w-6 text-purple-600" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <h3 className="text-lg font-medium text-gray-900">Manage Invigilation</h3>
-                                        <p className="text-sm text-gray-600">Assign teachers to exam supervision</p>
-                                    </div>
-                                </div>
-                                <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
-                            </Link>
-
-                            <Link
-                                href={route('responsable.report')}
-                                className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow group"
-                            >
-                                <div className="flex items-center">
-                                    <div className="flex-shrink-0 bg-amber-100 rounded-lg p-3 group-hover:bg-amber-200 transition-colors">
-                                        <FileText className="h-6 w-6 text-amber-600" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <h3 className="text-lg font-medium text-gray-900">View Reports</h3>
-                                        <p className="text-sm text-gray-600">Generate detailed reports and analytics</p>
-                                    </div>
-                                </div>
-                                <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-amber-600 transition-colors" />
-                            </Link>
                         </div>
                     </div>
 
@@ -255,6 +196,73 @@ export default function Dashboard({
                         </div>
                     </div>
                 </div>
+
+                {/* Quick Actions Navbar */}
+                <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+                    <h2 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+                    
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <Link
+                                href="/Responsable/Exams/Create"
+                                className="flex-1 bg-blue-50 rounded-lg p-4 hover:bg-blue-100 transition-colors group border border-blue-200"
+                            >
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0 bg-blue-100 rounded-lg p-2 group-hover:bg-blue-200 transition-colors">
+                                        <Calendar className="h-5 w-5 text-blue-600" />
+                                    </div>
+                                    <div className="ml-3">
+                                        <h3 className="text-sm font-medium text-gray-900">Schedule Exam</h3>
+                                        <p className="text-xs text-gray-600">Create new exam</p>
+                                    </div>
+                                </div>
+                            </Link>
+
+                            <Link
+                                href="/Responsable/Planning/Calendar"
+                                className="flex-1 bg-green-50 rounded-lg p-4 hover:bg-green-100 transition-colors group border border-green-200"
+                            >
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0 bg-green-100 rounded-lg p-2 group-hover:bg-green-200 transition-colors">
+                                        <CalendarDays className="h-5 w-5 text-green-600" />
+                                    </div>
+                                    <div className="ml-3">
+                                        <h3 className="text-sm font-medium text-gray-900">Calendar</h3>
+                                        <p className="text-xs text-gray-600">View schedules</p>
+                                    </div>
+                                </div>
+                            </Link>
+
+                            <Link
+                                href="/Responsable/Invigilation/Index"
+                                className="flex-1 bg-purple-50 rounded-lg p-4 hover:bg-purple-100 transition-colors group border border-purple-200"
+                            >
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0 bg-purple-100 rounded-lg p-2 group-hover:bg-purple-200 transition-colors">
+                                        <Users className="h-5 w-5 text-purple-600" />
+                                    </div>
+                                    <div className="ml-3">
+                                        <h3 className="text-sm font-medium text-gray-900">Invigilation</h3>
+                                        <p className="text-xs text-gray-600">Manage supervision</p>
+                                    </div>
+                                </div>
+                            </Link>
+
+                            <Link
+                                href="/Responsable/Report"
+                                className="flex-1 bg-amber-50 rounded-lg p-4 hover:bg-amber-100 transition-colors group border border-amber-200"
+                            >
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0 bg-amber-100 rounded-lg p-2 group-hover:bg-amber-200 transition-colors">
+                                        <FileText className="h-5 w-5 text-amber-600" />
+                                    </div>
+                                    <div className="ml-3">
+                                        <h3 className="text-sm font-medium text-gray-900">Reports</h3>
+                                        <p className="text-xs text-gray-600">View analytics</p>
+                                    </div>
+                                </div>
+                            </Link>
+                        </div>
+                    </div>
             </div>
         </AuthenticatedLayout>
     );

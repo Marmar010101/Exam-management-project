@@ -17,8 +17,10 @@ class HeaddepartmentSeeder extends Seeder
     {
         $user = User::create([
             'matricule' => 'ADMIN001',
-            'password'  => bcrypt('123456'), 
+            'password'  => bcrypt('password123'), 
             'role' => 'headdepartment',
+            'first_name' => 'Ahmed',
+            'last_name' => 'Afraoui',
         ]);
 
        

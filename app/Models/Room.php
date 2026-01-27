@@ -10,16 +10,16 @@ class Room extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'capacity',
-        'type',
-        'status',
+        'room_name',
+        'room_capacity',
+        'room_type',
+        'availability',
         'description',
     ];
 
     protected $casts = [
-        'capacity' => 'integer',
-        'status' => 'boolean',
+        'room_capacity' => 'integer',
+        'availability' => 'integer',
     ];
 
     public function exams()

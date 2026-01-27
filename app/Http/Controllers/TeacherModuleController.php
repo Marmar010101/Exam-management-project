@@ -16,22 +16,20 @@ class TeacherModuleController extends Controller
     {
         $user = Auth::user();
         
-        // Get teacher's modules through teacher_modules relationship
+        // Get teacher's modules directly from modules table
         $modules = DB::table('modules')
-            ->select('modules.*')
-            ->join('teacher_modules', 'modules.id', '=', 'teacher_modules.module_id')
-            ->where('teacher_modules.teacher_id', $user->id)
-            ->orderBy('modules.module_name')
+            ->where('teacher_id', $user->id)
+            ->orderBy('module_name')
             ->get()
             ->map(function ($module) {
                 return [
                     'id' => $module->id,
                     'name' => $module->module_name,
-                    'code' => $module->module_name ?? 'N/A',
-                    'speciality' => 'Non spécifié',
-                    'level' => 'Non spécifié',
-                    'semester' => 'Non spécifié',
-                    'credits' => 6,
+                    'code' => $module->code ?? $module->module_name ?? 'N/A',
+                    'speciality' => $module->speciality ?? 'Non spécifié',
+                    'level' => $module->level ?? 'Non spécifié',
+                    'semester' => $module->semester ?? 'Non spécifié',
+                    'credits' => $module->credits ?? 6,
                 ];
             });
 

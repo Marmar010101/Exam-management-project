@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import Sidebar from '@/Components/Sidebar';
+import Notifications from '@/Components/Notifications';
 import { Bell, Menu, User } from 'lucide-react';
 
 export default function AuthenticatedLayout({ children, header }) {
@@ -23,24 +24,42 @@ export default function AuthenticatedLayout({ children, header }) {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Mode sombre
+    // Mode sombre - amélioré avec synchronisation
     useEffect(() => {
         const darkMode = localStorage.getItem('darkMode') === 'true';
         if (darkMode) {
             document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
         }
+    }, []);
+
+    // Écouter les changements de mode sombre depuis d'autres composants
+    useEffect(() => {
+        const handleStorageChange = (e) => {
+            if (e.key === 'darkMode') {
+                if (e.newValue === 'true') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
 
     const getDashboardRoute = () => {
         switch(role) {
             case 'headdepartment':
-                return route('headdepartment.dashboard');
+                return '/HeadDepartment/Dashboard';
             case 'teacher':
-                return route('teacher.dashboard');
+                return '/Teacher/Dashboard';
             case 'responsable':
-                return route('responsable.dashboard');
+                return '/Responsable/Dashboard';
             case 'student':
-                return route('student.dashboard');
+                return '/Student/Dashboard';
             default:
                 return '#';
         }
@@ -78,7 +97,14 @@ export default function AuthenticatedLayout({ children, header }) {
             </div>
 
             <div className="md:pl-64 flex flex-col min-h-screen">
-                <header className="sticky top-0 z-30 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <header className="
+  sticky top-0 z-30
+  bg-white/80 dark:bg-gray-800/80
+  backdrop-blur-sm
+  border-b border-gray-200/50 dark:border-gray-700/50
+">
+
+
                     <div className="px-6 py-4 flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <button
@@ -88,16 +114,14 @@ export default function AuthenticatedLayout({ children, header }) {
                                 <Menu size={24} />
                             </button>
                             
-                            <div className="text-lg font-semibold text-black dark:text-white">
-                                {header || 'Dashboard'}
-                            </div>
+                            <div className="text-xl font-semibold text-black dark:text-white font-inter tracking-tight">
+    {header || 'Dashboard'}
+</div>
+
                         </div>
 
                         <div className="flex items-center space-x-4">
-                            <button className="relative p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg">
-                                <Bell size={20} />
-                            </button>
-
+                            <Notifications />
                             <div className="flex items-center space-x-3">
                               <div className="text-right hidden md:block">
                                     <p className="text-sm font-medium text-blue-500 dark:text-blue-400">
@@ -107,12 +131,20 @@ export default function AuthenticatedLayout({ children, header }) {
                                         {user.matricule}
                                     </p>
                                 </div>
-                                <Link
-                                    href={route('profile.edit')}
-                                    className="bg-gray-100 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition"
-                                >
-                                    <User size={20} className="text-gray-500 dark:text-gray-400" />
-                                </Link>
+                              <Link
+  href="/profile"
+  className="
+    w-10 h-10 flex items-center justify-center
+    rounded-full bg-gray-100 dark:bg-gray-700
+    hover:bg-gray-200 dark:hover:bg-gray-600
+    transition-colors duration-200
+  "
+>
+  <User size={18} className="text-gray-600 dark:text-gray-300" />
+</Link>
+
+
+
                             </div>
                         </div>
                     </div>
@@ -125,6 +157,7 @@ export default function AuthenticatedLayout({ children, header }) {
                 </main>
 
                 <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 px-6">
+
                     <div className="text-center text-sm text-gray-500 dark:text-gray-400">
                         Examination Management System &copy; {new Date().getFullYear()}
                     </div>

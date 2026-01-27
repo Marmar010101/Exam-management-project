@@ -11,11 +11,11 @@ class Exam extends Model
 
     protected $fillable = [
         'exam_type',
-        'exame_date',
-        'exame_time',
+        'exam_date_old',
+        'exam_time_old',
         'teacher_id',
-        'id_group',
-        'id_module',
+        'group_id',
+        'module_id',
         'room_id',
         'duration',
         'status',
@@ -23,11 +23,12 @@ class Exam extends Model
         'validated_by',
         'validation_notes',
         'validated_at',
+        'semester_id',
     ];
 
     protected $casts = [
-        'exame_date' => 'date',
-        'exame_time' => 'datetime',
+        'exam_date_old' => 'date',
+        'exam_time_old' => 'datetime',
         'validated_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -35,12 +36,12 @@ class Exam extends Model
 
     public function module()
     {
-        return $this->belongsTo(Module::class, 'id_module');
+        return $this->belongsTo(Module::class, 'module_id');
     }
 
     public function group()
     {
-        return $this->belongsTo(Group::class, 'id_group');
+        return $this->belongsTo(Group::class, 'group_id');
     }
 
     public function teacher()
@@ -104,11 +105,11 @@ class Exam extends Model
 
     public function getFormattedDate(): string
     {
-        return $this->exame_date ? $this->exame_date->format('M d, Y') : 'N/A';
+        return $this->exam_date_old ? $this->exam_date_old->format('M d, Y') : 'N/A';
     }
 
     public function getFormattedTime(): string
     {
-        return $this->exame_time ? $this->exame_time->format('H:i') : 'N/A';
+        return $this->exam_time_old ? $this->exam_time_old->format('H:i') : 'N/A';
     }
 }

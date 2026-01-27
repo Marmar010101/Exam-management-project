@@ -8,6 +8,7 @@ use App\Models\Level;
 use App\Models\Semester;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 
 class ModuleController extends Controller
 {
@@ -16,32 +17,56 @@ class ModuleController extends Controller
      */
     public function index()
     {
-        $modules = Module::with(['speciality'])->get()->map(function ($module) {
-            return [
-                'id' => $module->id,
-                'module_name' => $module->module_name,
-                'code' => $module->code ?? 'N/A',
-                'speciality' => $module->speciality->name ?? 'N/A',
-                'speciality_id' => $module->speciality_id,
-                'level' => 'N/A', // Pas de relation level pour l'instant
-                'level_id' => $module->level_id ?? null,
-                'semester' => 'N/A', // Pas de relation semester pour l'instant
-                'semester_id' => $module->semester_id ?? null,
-                'teacher' => 'Non assigné' // Plus de relation teacher
-            ];
-        });
+        // Debug: Vérifier les données
+        \Log::info('Specialities count: ' . Speciality::count());
+        \Log::info('Levels count: ' . Level::count());
+        \Log::info('Semesters count: ' . Semester::count());
+        \Log::info('Cycles count: ' . \App\Models\Cycle::count());
+        
+        // Utiliser DB::query pour éviter les problèmes de relations Eloquent
+        $modules = DB::table('modules')
+            ->leftJoin('specialities', 'modules.speciality_id', '=', 'specialities.id')
+            ->leftJoin('levels', 'modules.level_id', '=', 'levels.id')
+            ->leftJoin('semesters', 'modules.semester_id', '=', 'semesters.id')
+            ->leftJoin('cycles', 'levels.cycle_id', '=', 'cycles.id')
+            ->leftJoin('teachers', 'modules.teacher_id', '=', 'teachers.id')
+            ->select([
+                'modules.id',
+                'modules.module_name',
+                'modules.code',
+                'modules.speciality_id',
+                'modules.level_id',
+                'modules.semester_id',
+                'modules.credits',
+                'modules.volume_cm',
+                'modules.volume_td',
+                'modules.teacher_id',
+                'specialities.name as speciality_name',
+                'levels.name as level_name',
+                'semesters.name as semester_name',
+                'cycles.cycle_name as cycle_name',
+                'teachers.first_name as teacher_first_name',
+                'teachers.last_name as teacher_last_name'
+            ])
+            ->get();
 
         $specialities = Speciality::all(['id', 'name']);
-        $levels = \App\Models\StudyLevel::with('studySystem')->get(['id', 'name', 'study_system_id']);
-        $semesters = Semester::all(['id', 'name']);
-        $filieres = \App\Models\Filiere::all(['id', 'name']);
+        $levels = Level::with('cycle')->get(['id', 'name', 'cycle_id']);
+        $semesters = Semester::all(['id', 'name', 'level_id']);
+        $cycles = \App\Models\Cycle::all(['id', 'cycle_name']);
+
+        // Debug: Vérifier les collections
+        \Log::info('Specialities collection: ' . $specialities->count());
+        \Log::info('Levels collection: ' . $levels->count());
+        \Log::info('Semesters collection: ' . $semesters->count());
+        \Log::info('Cycles collection: ' . $cycles->count());
 
         return Inertia::render('HeadDepartment/modules', [
             'modules' => $modules,
             'specialities' => $specialities,
             'levels' => $levels,
             'semesters' => $semesters,
-            'filieres' => $filieres
+            'cycles' => $cycles
         ]);
     }
 
@@ -52,17 +77,18 @@ class ModuleController extends Controller
     {
         $validated = $request->validate([
             'module_name' => 'required|string|max:255',
-            'code' => 'required|string|max:50',
+            'code' => 'required|string|max:50|unique:modules,code',
             'speciality_id' => 'required|exists:specialities,id',
-            'level_id' => 'nullable|exists:study_levels,id',
-            'semester_id' => 'nullable|exists:semesters,id',
-            'filiere_id' => 'nullable|exists:filieres,id'
-            // 'teacher_id' => 'nullable|exists:teachers,id' // Commenté - table teachers n'existe plus
+            'level_id' => 'required|exists:levels,id',
+            'semester_id' => 'required|exists:semesters,id',
+            'credits' => 'required|integer|min:1|max:7',
+            'volume_cm' => 'nullable|integer|min:0|max:60',
+            'volume_td' => 'nullable|integer|min:0|max:60'
         ]);
 
         Module::create($validated);
 
-        return redirect()->back()->with('success', 'Module créé avec succès');
+        return redirect()->back()->with('success', 'Module created successfully');
     }
 
     /**
@@ -72,17 +98,18 @@ class ModuleController extends Controller
     {
         $validated = $request->validate([
             'module_name' => 'required|string|max:255',
-            'code' => 'required|string|max:50',
+            'code' => 'required|string|max:50|unique:modules,code,' . $module->id,
             'speciality_id' => 'required|exists:specialities,id',
-            'level_id' => 'nullable|exists:study_levels,id',
-            'semester_id' => 'nullable|exists:semesters,id',
-            'filiere_id' => 'nullable|exists:filieres,id'
-            // 'teacher_id' => 'nullable|exists:teachers,id' // Commenté - table teachers n'existe plus
+            'level_id' => 'required|exists:levels,id',
+            'semester_id' => 'required|exists:semesters,id',
+            'credits' => 'required|integer|min:1|max:7',
+            'volume_cm' => 'nullable|integer|min:0|max:60',
+            'volume_td' => 'nullable|integer|min:0|max:60'
         ]);
 
         $module->update($validated);
 
-        return redirect()->back()->with('success', 'Module mis à jour avec succès');
+        return redirect()->back()->with('success', 'Module updated successfully');
     }
 
     /**
@@ -92,6 +119,6 @@ class ModuleController extends Controller
     {
         $module->delete();
 
-        return redirect()->back()->with('success', 'Module supprimé avec succès');
+        return redirect()->back()->with('success', 'Module deleted successfully');
     }
 }

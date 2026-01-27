@@ -36,8 +36,8 @@ class ReportController extends Controller
             });
 
         // Examens par mois
-        $examsByMonth = Exam::selectRaw('MONTH(exame_date) as month, COUNT(*) as count')
-            ->whereYear('exame_date', date('Y'))
+        $examsByMonth = Exam::selectRaw('MONTH(exam_date_old) as month, COUNT(*) as count')
+            ->whereYear('exam_date_old', date('Y'))
             ->groupBy('month')
             ->orderBy('month')
             ->get()
@@ -91,16 +91,16 @@ class ReportController extends Controller
 
         // Examens à venir
         $upcomingExams = Exam::with(['module', 'group', 'teacher'])
-            ->where('exame_date', '>=', now())
-            ->orderBy('exame_date')
+            ->where('exam_date_old', '>=', now())
+            ->orderBy('exam_date_old')
             ->take(10)
             ->get()
             ->map(function ($exam) {
                 return [
                     'module' => $exam->module?->module_name,
                     'group' => $exam->group?->name,
-                    'date' => $exam->exame_date,
-                    'time' => $exam->exame_time,
+                    'date' => $exam->exam_date_old,
+                    'time' => $exam->exam_time_old,
                     'teacher' => $exam->teacher?->first_name . ' ' . $exam->teacher?->last_name,
                 ];
             });
@@ -115,25 +115,24 @@ class ReportController extends Controller
     public function teacher()
     {
         $user = auth()->user();
-        $teacher = $user->teacher;
         
         // Examens du professeur
         $teacherExams = Exam::with(['module', 'group'])
-            ->where('teacher_id', $teacher->id)
-            ->orderBy('exame_date', 'desc')
+            ->where('teacher_id', $user->id)
+            ->orderBy('exam_date_old', 'desc')
             ->get()
             ->map(function ($exam) {
                 return [
                     'module' => $exam->module?->module_name,
                     'group' => $exam->group?->name,
-                    'date' => $exam->exame_date,
-                    'time' => $exam->exame_time,
+                    'date' => $exam->exam_date_old,
+                    'time' => $exam->exam_time_old,
                     'type' => $exam->exam_type,
                 ];
             });
 
         // Modules enseignés
-        $modules = Module::where('teacher_id', $teacher->id)->get();
+        $modules = Module::where('teacher_id', $user->id)->get();
 
         // Statistiques
         $stats = [
@@ -143,6 +142,9 @@ class ReportController extends Controller
         ];
 
         return Inertia::render('Teacher/Report', [
+            'auth' => [
+                'user' => $user
+            ],
             'stats' => $stats,
             'exams' => $teacherExams,
             'modules' => $modules,
@@ -160,14 +162,14 @@ class ReportController extends Controller
 
         // Examens de l'étudiant (basé sur son groupe)
         $studentExams = Exam::with(['module', 'teacher'])
-            ->where('id_group', $student->group_id)
-            ->orderBy('exame_date', 'desc')
+            ->where('group_id', $student->group_id)
+            ->orderBy('exam_date_old', 'desc')
             ->get()
             ->map(function ($exam) {
                 return [
                     'module' => $exam->module?->module_name,
-                    'date' => $exam->exame_date,
-                    'time' => $exam->exame_time,
+                    'date' => $exam->exam_date_old,
+                    'time' => $exam->exam_time_old,
                     'type' => $exam->exam_type,
                     'teacher' => $exam->teacher?->first_name . ' ' . $exam->teacher?->last_name,
                 ];

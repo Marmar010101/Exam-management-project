@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Headdepartment;
 use App\Models\User;
 use Inertia\Inertia;
 
-class AcountManagementController extends Controller
+class AccountManagementController extends Controller
 {
     public function index($type = 'students')
     {

@@ -18,15 +18,10 @@ class NotificationController extends Controller
         $currentPage = $request->input('page', 1);
 
         // Get total count
-        $total = DB::table('notifications')
-            ->where('notifiable_id', $user->id)
-            ->where('notifiable_type', 'App\Models\User')
-            ->count();
+        $total = \App\Models\Notification::where('user_id', $user->id)->count();
 
         // Get paginated data
-        $notifications = DB::table('notifications')
-            ->where('notifiable_id', $user->id)
-            ->where('notifiable_type', 'App\Models\User')
+        $notifications = \App\Models\Notification::where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->skip(($currentPage - 1) * $perPage)
             ->take($perPage)
@@ -35,15 +30,16 @@ class NotificationController extends Controller
         // Transform data
         $formattedNotifications = [];
         foreach ($notifications as $notification) {
-            $data = json_decode($notification->data, true);
+            $data = is_string($notification->data) ? json_decode($notification->data, true) : $notification->data;
             
             $formattedNotifications[] = [
                 'id' => $notification->id,
                 'type' => $notification->type,
                 'data' => $data,
-                'read_at' => $notification->read_at,
+                'read_at' => $notification->read ? now() : null, // Convert 'read' to 'read_at' format
                 'created_at' => $notification->created_at,
                 'created_at_human' => \Carbon\Carbon::parse($notification->created_at)->diffForHumans(),
+                'is_unread' => !$notification->read, // Use 'read' field
             ];
         }
 
@@ -77,11 +73,9 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
 
-        DB::table('notifications')
-            ->where('id', $id)
-            ->where('notifiable_id', $user->id)
-            ->where('notifiable_type', 'App\Models\User')
-            ->update(['read_at' => now()]);
+        \App\Models\Notification::where('id', $id)
+            ->where('user_id', $user->id)
+            ->update(['read' => true]); // Use 'read' field
             
         return response()->json(['success' => true]);
     }
@@ -90,11 +84,9 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
 
-        DB::table('notifications')
-            ->where('notifiable_id', $user->id)
-            ->where('notifiable_type', 'App\Models\User')
-            ->whereNull('read_at')
-            ->update(['read_at' => now()]);
+        \App\Models\Notification::where('user_id', $user->id)
+            ->where('read', false) // Use 'read' field
+            ->update(['read' => true]);
             
         return response()->json(['success' => true]);
     }
@@ -103,10 +95,8 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
 
-        $count = DB::table('notifications')
-            ->where('notifiable_id', $user->id)
-            ->where('notifiable_type', 'App\Models\User')
-            ->whereNull('read_at')
+        $count = \App\Models\Notification::where('user_id', $user->id)
+            ->where('read', false) // Use 'read' field
             ->count();
 
         return response()->json(['count' => $count]);
@@ -116,34 +106,30 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
 
-        $notifications = DB::table('notifications')
-            ->where('notifiable_id', $user->id)
-            ->where('notifiable_type', 'App\Models\User')
+        $notifications = \App\Models\Notification::where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
 
         $formatted = [];
         foreach ($notifications as $notification) {
-            $data = json_decode($notification->data, true);
+            $data = is_string($notification->data) ? json_decode($notification->data, true) : $notification->data;
             
             $formatted[] = [
                 'id' => $notification->id,
                 'type' => $notification->type,
                 'data' => $data,
-                'read_at' => $notification->read_at,
+                'read_at' => $notification->read ? now() : null, // Convert 'read' to 'read_at' format
                 'created_at' => $notification->created_at,
                 'created_at_human' => \Carbon\Carbon::parse($notification->created_at)->diffForHumans(),
-                'is_unread' => is_null($notification->read_at),
+                'is_unread' => !$notification->read, // Use 'read' field
             ];
         }
 
         return response()->json([
             'notifications' => $formatted,
-            'unread_count' => DB::table('notifications')
-                ->where('notifiable_id', $user->id)
-                ->where('notifiable_type', 'App\Models\User')
-                ->whereNull('read_at')
+            'unread_count' => \App\Models\Notification::where('user_id', $user->id)
+                ->where('read', false) // Use 'read' field
                 ->count()
         ]);
     }

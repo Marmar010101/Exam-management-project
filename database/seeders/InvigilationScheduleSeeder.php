@@ -27,9 +27,9 @@ class InvigilationScheduleSeeder extends Seeder
                     'exam_id' => $exam->id,
                     'teacher_id' => $teacher->id,
                     'room_id' => $selectedRoom->id,
-                    'exam_date' => $exam->exame_date,
-                    'start_time' => $exam->exame_time,
-                    'end_time' => date('H:i:s', strtotime($exam->exame_time) + 7200), // +2 heures
+                    'exam_date' => $exam->exam_date,
+                    'start_time' => $exam->start_time,
+                    'end_time' => $exam->end_time,
                     'status' => rand(0, 1) ? 'confirmed' : 'pending',
                     'room_name' => $selectedRoom->room_name,
                 ]);

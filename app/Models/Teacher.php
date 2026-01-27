@@ -55,4 +55,9 @@ class Teacher extends Model
     {
         return $this->hasMany(TeacherAlert::class);
     }
+
+    public function modules()
+    {
+        return $this->hasMany(Module::class, 'teacher_id');
+    }
 }

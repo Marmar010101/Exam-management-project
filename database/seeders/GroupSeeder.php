@@ -18,19 +18,18 @@ class GroupSeeder extends Seeder
     public function run()
     {
     $groups = [
-    // Années 1-3 sans speciality
-    ['name'=>'L1 S1 G1','cycle_id'=>1,'level_id'=>1,'speciality_id'=>null,'semester_id' =>1],
-    ['name'=>'L1 S1 G2','cycle_id'=>1,'level_id'=>1, 'speciality_id'=>null,'semester_id' =>1],
-    ['name'=>'L1 S2 G1','cycle_id'=>1,'level_id'=>2, 'speciality_id'=>null,'semester_id' =>1],
-    ['name'=>'L1 S2 G2','cycle_id'=>1,'level_id'=>2, 'speciality_id'=>null,'semester_id' =>1],
-    
-    // Année 4 avec speciality
-    ['name'=>'Groupe Génie Logiciel','cycle_id'=>1,'level_id'=>4,'speciality_id'=>1,'semester_id' =>1],
-    ['name'=>'Groupe Réseau','cycle_id'=>1,'level_id'=>4,'speciality_id'=>2,'semester_id' =>1],
-    ['name'=>'Groupe SIC','cycle_id'=>1,'level_id'=>4,'speciality_id'=>3,'semester_id' =>1],
-    ['name'=>'Groupe IA','cycle_id'=>1,'level_id'=>4,'speciality_id'=>4,'semester_id' =>1],
-];
-foreach($groups as $g) Group::create($g);
+            // Utiliser les premiers niveaux disponibles (1-5)
+            ['name' => 'Groupe 1-1', 'level_id' => 1, 'speciality_id' => 1],
+            ['name' => 'Groupe 1-2', 'level_id' => 2, 'speciality_id' => 1],
+            ['name' => 'Groupe 2-1', 'level_id' => 3, 'speciality_id' => 2],
+            ['name' => 'Groupe 2-2', 'level_id' => 4, 'speciality_id' => 2],
+            ['name' => 'Groupe 3-1', 'level_id' => 5, 'speciality_id' => 3],
+            ['name' => 'Groupe 3-2', 'level_id' => 1, 'speciality_id' => 3],
+        ];
+        
+        foreach($groups as $g) {
+            Group::create(array_merge($g, ['semester_id' => 211]));
+        }
 
     }
 }

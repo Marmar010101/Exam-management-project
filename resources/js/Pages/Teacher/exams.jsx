@@ -30,8 +30,8 @@ export default function TeacherExams({
     };
 
     return (
-        <AuthenticatedLayout header="Mes Examens">
-            <Head title="Mes Examens" />
+        <AuthenticatedLayout header="My Exams">
+            <Head title="My Exams" />
             
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Success Message */}
@@ -44,50 +44,50 @@ export default function TeacherExams({
                 {/* Header */}
                 <div className="mb-6">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Mes Examens</h2>
-                        <p className="text-gray-600 mt-1">Consultez les examens liés à vos modules</p>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">My Exams</h2>
+                        <p className="text-gray-600 dark:text-gray-400 mt-1">View exams related to your modules</p>
                     </div>
                 </div>
 
                 {/* Exams List */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                     <div className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Liste des examens</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Exam List</h3>
                         
                         {exams.length === 0 ? (
                             <div className="text-center py-8">
-                                <Calendar className="text-gray-400 mx-auto mb-3" size={48} />
-                                <p className="text-gray-500">Aucun examen trouvé</p>
+                                <Calendar className="text-gray-400 dark:text-gray-500 mx-auto mb-3" size={48} />
+                                <p className="text-gray-500 dark:text-gray-400">No exams found</p>
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-gray-50">
+                                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                    <thead className="bg-gray-50 dark:bg-gray-700">
                                         <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                                 Module
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                                 Type
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                                 Date
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Durée
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                Duration
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Groupe
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                Group
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Salle
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                Room
                                             </th>
-                                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                                 Actions
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                         {exams.map((exam) => (
                                             <tr key={exam.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

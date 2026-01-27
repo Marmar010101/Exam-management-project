@@ -20,15 +20,15 @@ class CalendarController extends Controller
 
         $examsByGroup = [];
         foreach ($groups as $group) {
-            $exams = Exam::where('id_group', $group->id)
+            $exams = Exam::where('group_id', $group->id)
                 ->with(['module:id,module_name'])
-                ->orderBy('exame_date')
-                ->orderBy('exame_time')
+                ->orderBy('exam_date_old')
+                ->orderBy('exam_time_old')
                 ->get()
                 ->map(function($exam) {
                     $roomName = 'No Room';
                     
-                    $examTime = $exam->exame_time;
+                    $examTime = $exam->exam_time_old;
                     if ($examTime) {
                         try {
                             $examTime = Carbon::parse($examTime)->format('H:i');
@@ -41,10 +41,10 @@ class CalendarController extends Controller
 
                     return [
                         'id' => $exam->id,
-                        'exam_date' => $exam->exame_date,
+                        'exam_date' => $exam->exam_date_old,
                         'exam_time' => $examTime,
                         'exam_type' => $exam->exam_type,
-                        'module_id' => $exam->id_module,
+                        'module_id' => $exam->module_id,
                         'module_name' => $exam->module->module_name ?? 'Unknown Module',
                         'room_name' => $roomName,
                     ];

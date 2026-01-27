@@ -18,20 +18,29 @@ class ExamPlan extends Model
         'teacher_id',
         'room_id',
         'exam_type',
-        'exam_date',
+        'exam_subtype',
+        'start_date',
+        'end_date',
         'start_time',
         'end_time',
-        'duration_minutes',
         'description',
         'status',
+        'sent_to_head_at',
         'validation_notes',
         'validated_at',
+        'is_planning_generated',
+        'planning_type',
+        'planning_data',
+        'batch_id',
+        'group_index',
     ];
 
     protected $casts = [
-        'exam_date' => 'date',
+        'start_date' => 'date',
+        'end_date' => 'date',
         'start_time' => 'datetime',
         'end_time' => 'datetime',
+        'sent_to_head_at' => 'datetime',
         'validated_at' => 'datetime',
     ];
 
@@ -73,6 +82,7 @@ class ExamPlan extends Model
             'validated' => 'bg-green-100 text-green-800 border-green-200',
             'rejected' => 'bg-red-100 text-red-800 border-red-200',
             'scheduled' => 'bg-blue-100 text-blue-800 border-blue-200',
+            'sent_to_head' => 'bg-purple-100 text-purple-800 border-purple-200',
             default => 'bg-gray-100 text-gray-800 border-gray-200',
         };
     }
@@ -84,6 +94,7 @@ class ExamPlan extends Model
             'validated' => 'Validated',
             'rejected' => 'Rejected',
             'scheduled' => 'Scheduled',
+            'sent_to_head' => 'Sent to Head',
             default => ucfirst($this->status),
         };
     }
@@ -91,18 +102,35 @@ class ExamPlan extends Model
     public function getExamTypeLabel(): string
     {
         return match($this->exam_type) {
-            'Final' => 'Final Exam',
-            'Midterm' => 'Midterm Exam',
-            'Quiz' => 'Quiz',
-            'Practical' => 'Practical Exam',
-            'Oral' => 'Oral Exam',
+            'Exam' => 'Exam',
+            'Control' => 'Control',
+            'Test_TP' => 'Test_TP',
             default => $this->exam_type,
         };
     }
 
     public function getFormattedDate(): string
     {
-        return $this->exam_date->format('M d, Y');
+        // Use start_date if available, otherwise fall back to exam_date
+        $date = $this->start_date ?? $this->exam_date;
+        return $date ? $date->format('M d, Y') : 'No date';
+    }
+
+    public function getFormattedDateRange(): string
+    {
+        // Use start_date and end_date if available, otherwise fall back to exam_date
+        $startDate = $this->start_date ?? $this->exam_date;
+        $endDate = $this->end_date ?? $this->exam_date;
+        
+        if (!$startDate) {
+            return 'No date';
+        }
+        
+        if ($startDate->eq($endDate)) {
+            return $startDate->format('M d, Y');
+        }
+        
+        return $startDate->format('M d') . ' - ' . $endDate->format('M d, Y');
     }
 
     public function getFormattedTime(): string
